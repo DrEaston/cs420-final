@@ -11,6 +11,8 @@ options(repos = c(CRAN = "https://cloud.r-project.org"))
 
 ```
 
+## load data
+
 ```{r}
 
 # Load Necessary Libraries
@@ -47,9 +49,18 @@ wine_data$alcohol_category = as.factor(wine_data$alcohol_category)
 
 ```
 
+## Data types
+
+
+```{r}
+
+str(wine_data)
+
+```
 
 
 
+## Fit additive Model
 
 ```{r}
 
@@ -70,6 +81,8 @@ vif_values
 
 
 ```
+
+## Fit interaction model
 
 ```{r}
 

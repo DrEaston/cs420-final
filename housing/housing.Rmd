@@ -9,11 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Load and clean data
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
 # Load necessary libraries
@@ -22,8 +20,7 @@ library(dplyr)
 # Load the dataset
 housing_data = read.csv("train.csv")
 
-# View the dataset structure
-str(housing_data)
+
 
 # Basic data cleaning (remove rows with missing SalePrice or predictors)
 housing_data_clean = housing_data %>%
@@ -36,6 +33,21 @@ housing_data_clean = housing_data %>%
 housing_data_clean$KitchenQual = as.factor(housing_data_clean$KitchenQual)  # Kitchen Quality
 housing_data_clean$Neighborhood = as.factor(housing_data_clean$Neighborhood)  # Neighborhood
 
+```
+
+## Datatypes of selected variables
+
+```{r}
+
+str(housing_data_clean)
+
+```
+
+
+## Fit additive model
+
+```{r}
+
 # Fit a linear model
 model = lm(SalePrice ~ ., data = housing_data_clean)
 
@@ -45,6 +57,33 @@ summary(model)
 str(housing_data_clean)
 
 ```
+```{r}
+
+if (!require(car)) install.packages("car")
+library(car)
+
+# Compute VIF Values
+vif_values = vif(model)
+
+# Display the VIF Values
+vif_values
+
+
+```
+
+
+## Fit interaction model
+
+```{r}
+
+# Fit a linear model
+model = lm(SalePrice ~ .^2, data = housing_data_clean)
+
+summary(model)
+
+
+```
+
 
 ## Including Plots
 

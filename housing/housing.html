@@ -357,15 +357,8 @@ display: none;
 </div>
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting
-syntax for authoring HTML, PDF, and MS Word documents. For more details
-on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be
-generated that includes both content as well as the output of any
-embedded R code chunks within the document. You can embed an R code
-chunk like this:</p>
+<div id="load-and-clean-data" class="section level2">
+<h2>Load and clean data</h2>
 <pre class="r"><code># Load necessary libraries
 library(dplyr)</code></pre>
 <pre><code>## 
@@ -379,91 +372,9 @@ library(dplyr)</code></pre>
 <pre class="r"><code># Load the dataset
 housing_data = read.csv(&quot;train.csv&quot;)
 
-# View the dataset structure
-str(housing_data)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    1460 obs. of  81 variables:
-##  $ Id           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ MSSubClass   : int  60 20 60 70 60 50 20 60 50 190 ...
-##  $ MSZoning     : chr  &quot;RL&quot; &quot;RL&quot; &quot;RL&quot; &quot;RL&quot; ...
-##  $ LotFrontage  : int  65 80 68 60 84 85 75 NA 51 50 ...
-##  $ LotArea      : int  8450 9600 11250 9550 14260 14115 10084 10382 6120 7420 ...
-##  $ Street       : chr  &quot;Pave&quot; &quot;Pave&quot; &quot;Pave&quot; &quot;Pave&quot; ...
-##  $ Alley        : chr  NA NA NA NA ...
-##  $ LotShape     : chr  &quot;Reg&quot; &quot;Reg&quot; &quot;IR1&quot; &quot;IR1&quot; ...
-##  $ LandContour  : chr  &quot;Lvl&quot; &quot;Lvl&quot; &quot;Lvl&quot; &quot;Lvl&quot; ...
-##  $ Utilities    : chr  &quot;AllPub&quot; &quot;AllPub&quot; &quot;AllPub&quot; &quot;AllPub&quot; ...
-##  $ LotConfig    : chr  &quot;Inside&quot; &quot;FR2&quot; &quot;Inside&quot; &quot;Corner&quot; ...
-##  $ LandSlope    : chr  &quot;Gtl&quot; &quot;Gtl&quot; &quot;Gtl&quot; &quot;Gtl&quot; ...
-##  $ Neighborhood : chr  &quot;CollgCr&quot; &quot;Veenker&quot; &quot;CollgCr&quot; &quot;Crawfor&quot; ...
-##  $ Condition1   : chr  &quot;Norm&quot; &quot;Feedr&quot; &quot;Norm&quot; &quot;Norm&quot; ...
-##  $ Condition2   : chr  &quot;Norm&quot; &quot;Norm&quot; &quot;Norm&quot; &quot;Norm&quot; ...
-##  $ BldgType     : chr  &quot;1Fam&quot; &quot;1Fam&quot; &quot;1Fam&quot; &quot;1Fam&quot; ...
-##  $ HouseStyle   : chr  &quot;2Story&quot; &quot;1Story&quot; &quot;2Story&quot; &quot;2Story&quot; ...
-##  $ OverallQual  : int  7 6 7 7 8 5 8 7 7 5 ...
-##  $ OverallCond  : int  5 8 5 5 5 5 5 6 5 6 ...
-##  $ YearBuilt    : int  2003 1976 2001 1915 2000 1993 2004 1973 1931 1939 ...
-##  $ YearRemodAdd : int  2003 1976 2002 1970 2000 1995 2005 1973 1950 1950 ...
-##  $ RoofStyle    : chr  &quot;Gable&quot; &quot;Gable&quot; &quot;Gable&quot; &quot;Gable&quot; ...
-##  $ RoofMatl     : chr  &quot;CompShg&quot; &quot;CompShg&quot; &quot;CompShg&quot; &quot;CompShg&quot; ...
-##  $ Exterior1st  : chr  &quot;VinylSd&quot; &quot;MetalSd&quot; &quot;VinylSd&quot; &quot;Wd Sdng&quot; ...
-##  $ Exterior2nd  : chr  &quot;VinylSd&quot; &quot;MetalSd&quot; &quot;VinylSd&quot; &quot;Wd Shng&quot; ...
-##  $ MasVnrType   : chr  &quot;BrkFace&quot; &quot;None&quot; &quot;BrkFace&quot; &quot;None&quot; ...
-##  $ MasVnrArea   : int  196 0 162 0 350 0 186 240 0 0 ...
-##  $ ExterQual    : chr  &quot;Gd&quot; &quot;TA&quot; &quot;Gd&quot; &quot;TA&quot; ...
-##  $ ExterCond    : chr  &quot;TA&quot; &quot;TA&quot; &quot;TA&quot; &quot;TA&quot; ...
-##  $ Foundation   : chr  &quot;PConc&quot; &quot;CBlock&quot; &quot;PConc&quot; &quot;BrkTil&quot; ...
-##  $ BsmtQual     : chr  &quot;Gd&quot; &quot;Gd&quot; &quot;Gd&quot; &quot;TA&quot; ...
-##  $ BsmtCond     : chr  &quot;TA&quot; &quot;TA&quot; &quot;TA&quot; &quot;Gd&quot; ...
-##  $ BsmtExposure : chr  &quot;No&quot; &quot;Gd&quot; &quot;Mn&quot; &quot;No&quot; ...
-##  $ BsmtFinType1 : chr  &quot;GLQ&quot; &quot;ALQ&quot; &quot;GLQ&quot; &quot;ALQ&quot; ...
-##  $ BsmtFinSF1   : int  706 978 486 216 655 732 1369 859 0 851 ...
-##  $ BsmtFinType2 : chr  &quot;Unf&quot; &quot;Unf&quot; &quot;Unf&quot; &quot;Unf&quot; ...
-##  $ BsmtFinSF2   : int  0 0 0 0 0 0 0 32 0 0 ...
-##  $ BsmtUnfSF    : int  150 284 434 540 490 64 317 216 952 140 ...
-##  $ TotalBsmtSF  : int  856 1262 920 756 1145 796 1686 1107 952 991 ...
-##  $ Heating      : chr  &quot;GasA&quot; &quot;GasA&quot; &quot;GasA&quot; &quot;GasA&quot; ...
-##  $ HeatingQC    : chr  &quot;Ex&quot; &quot;Ex&quot; &quot;Ex&quot; &quot;Gd&quot; ...
-##  $ CentralAir   : chr  &quot;Y&quot; &quot;Y&quot; &quot;Y&quot; &quot;Y&quot; ...
-##  $ Electrical   : chr  &quot;SBrkr&quot; &quot;SBrkr&quot; &quot;SBrkr&quot; &quot;SBrkr&quot; ...
-##  $ X1stFlrSF    : int  856 1262 920 961 1145 796 1694 1107 1022 1077 ...
-##  $ X2ndFlrSF    : int  854 0 866 756 1053 566 0 983 752 0 ...
-##  $ LowQualFinSF : int  0 0 0 0 0 0 0 0 0 0 ...
-##  $ GrLivArea    : int  1710 1262 1786 1717 2198 1362 1694 2090 1774 1077 ...
-##  $ BsmtFullBath : int  1 0 1 1 1 1 1 1 0 1 ...
-##  $ BsmtHalfBath : int  0 1 0 0 0 0 0 0 0 0 ...
-##  $ FullBath     : int  2 2 2 1 2 1 2 2 2 1 ...
-##  $ HalfBath     : int  1 0 1 0 1 1 0 1 0 0 ...
-##  $ BedroomAbvGr : int  3 3 3 3 4 1 3 3 2 2 ...
-##  $ KitchenAbvGr : int  1 1 1 1 1 1 1 1 2 2 ...
-##  $ KitchenQual  : chr  &quot;Gd&quot; &quot;TA&quot; &quot;Gd&quot; &quot;Gd&quot; ...
-##  $ TotRmsAbvGrd : int  8 6 6 7 9 5 7 7 8 5 ...
-##  $ Functional   : chr  &quot;Typ&quot; &quot;Typ&quot; &quot;Typ&quot; &quot;Typ&quot; ...
-##  $ Fireplaces   : int  0 1 1 1 1 0 1 2 2 2 ...
-##  $ FireplaceQu  : chr  NA &quot;TA&quot; &quot;TA&quot; &quot;Gd&quot; ...
-##  $ GarageType   : chr  &quot;Attchd&quot; &quot;Attchd&quot; &quot;Attchd&quot; &quot;Detchd&quot; ...
-##  $ GarageYrBlt  : int  2003 1976 2001 1998 2000 1993 2004 1973 1931 1939 ...
-##  $ GarageFinish : chr  &quot;RFn&quot; &quot;RFn&quot; &quot;RFn&quot; &quot;Unf&quot; ...
-##  $ GarageCars   : int  2 2 2 3 3 2 2 2 2 1 ...
-##  $ GarageArea   : int  548 460 608 642 836 480 636 484 468 205 ...
-##  $ GarageQual   : chr  &quot;TA&quot; &quot;TA&quot; &quot;TA&quot; &quot;TA&quot; ...
-##  $ GarageCond   : chr  &quot;TA&quot; &quot;TA&quot; &quot;TA&quot; &quot;TA&quot; ...
-##  $ PavedDrive   : chr  &quot;Y&quot; &quot;Y&quot; &quot;Y&quot; &quot;Y&quot; ...
-##  $ WoodDeckSF   : int  0 298 0 0 192 40 255 235 90 0 ...
-##  $ OpenPorchSF  : int  61 0 42 35 84 30 57 204 0 4 ...
-##  $ EnclosedPorch: int  0 0 0 272 0 0 0 228 205 0 ...
-##  $ X3SsnPorch   : int  0 0 0 0 0 320 0 0 0 0 ...
-##  $ ScreenPorch  : int  0 0 0 0 0 0 0 0 0 0 ...
-##  $ PoolArea     : int  0 0 0 0 0 0 0 0 0 0 ...
-##  $ PoolQC       : chr  NA NA NA NA ...
-##  $ Fence        : chr  NA NA NA NA ...
-##  $ MiscFeature  : chr  NA NA NA NA ...
-##  $ MiscVal      : int  0 0 0 0 0 700 0 350 0 0 ...
-##  $ MoSold       : int  2 5 9 2 12 10 8 11 4 1 ...
-##  $ YrSold       : int  2008 2007 2008 2006 2008 2009 2007 2009 2008 2008 ...
-##  $ SaleType     : chr  &quot;WD&quot; &quot;WD&quot; &quot;WD&quot; &quot;WD&quot; ...
-##  $ SaleCondition: chr  &quot;Normal&quot; &quot;Normal&quot; &quot;Normal&quot; &quot;Abnorml&quot; ...
-##  $ SalePrice    : int  208500 181500 223500 140000 250000 143000 307000 200000 129900 118000 ...</code></pre>
-<pre class="r"><code># Basic data cleaning (remove rows with missing SalePrice or predictors)
+
+
+# Basic data cleaning (remove rows with missing SalePrice or predictors)
 housing_data_clean = housing_data %&gt;%
   filter(!is.na(SalePrice)) %&gt;%  # Ensure no missing SalePrice
   select(SalePrice, LotArea, OverallQual, YearBuilt, GarageCars, TotalBsmtSF, 
@@ -472,9 +383,27 @@ housing_data_clean = housing_data %&gt;%
 
 # Convert categorical predictors to factors
 housing_data_clean$KitchenQual = as.factor(housing_data_clean$KitchenQual)  # Kitchen Quality
-housing_data_clean$Neighborhood = as.factor(housing_data_clean$Neighborhood)  # Neighborhood
-
-# Fit a linear model
+housing_data_clean$Neighborhood = as.factor(housing_data_clean$Neighborhood)  # Neighborhood</code></pre>
+</div>
+<div id="datatypes-of-selected-variables" class="section level2">
+<h2>Datatypes of selected variables</h2>
+<pre class="r"><code>str(housing_data_clean)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    1460 obs. of  11 variables:
+##  $ SalePrice   : int  208500 181500 223500 140000 250000 143000 307000 200000 129900 118000 ...
+##  $ LotArea     : int  8450 9600 11250 9550 14260 14115 10084 10382 6120 7420 ...
+##  $ OverallQual : int  7 6 7 7 8 5 8 7 7 5 ...
+##  $ YearBuilt   : int  2003 1976 2001 1915 2000 1993 2004 1973 1931 1939 ...
+##  $ GarageCars  : int  2 2 2 3 3 2 2 2 2 1 ...
+##  $ TotalBsmtSF : int  856 1262 920 756 1145 796 1686 1107 952 991 ...
+##  $ GrLivArea   : int  1710 1262 1786 1717 2198 1362 1694 2090 1774 1077 ...
+##  $ FullBath    : int  2 2 2 1 2 1 2 2 2 1 ...
+##  $ Fireplaces  : int  0 1 1 1 1 0 1 2 2 2 ...
+##  $ KitchenQual : Factor w/ 4 levels &quot;Ex&quot;,&quot;Fa&quot;,&quot;Gd&quot;,..: 3 4 3 3 3 4 3 4 4 4 ...
+##  $ Neighborhood: Factor w/ 25 levels &quot;Blmngtn&quot;,&quot;Blueste&quot;,..: 6 25 6 7 14 12 21 17 18 4 ...</code></pre>
+</div>
+<div id="fit-additive-model" class="section level2">
+<h2>Fit additive model</h2>
+<pre class="r"><code># Fit a linear model
 model = lm(SalePrice ~ ., data = housing_data_clean)
 
 # Summary of the model
@@ -544,6 +473,409 @@ summary(model)</code></pre>
 ##  $ Fireplaces  : int  0 1 1 1 1 0 1 2 2 2 ...
 ##  $ KitchenQual : Factor w/ 4 levels &quot;Ex&quot;,&quot;Fa&quot;,&quot;Gd&quot;,..: 3 4 3 3 3 4 3 4 4 4 ...
 ##  $ Neighborhood: Factor w/ 25 levels &quot;Blmngtn&quot;,&quot;Blueste&quot;,..: 6 25 6 7 14 12 21 17 18 4 ...</code></pre>
+<pre class="r"><code>if (!require(car)) install.packages(&quot;car&quot;)</code></pre>
+<pre><code>## Loading required package: car</code></pre>
+<pre><code>## Warning: package &#39;car&#39; was built under R version 4.4.2</code></pre>
+<pre><code>## Loading required package: carData</code></pre>
+<pre><code>## Warning: package &#39;carData&#39; was built under R version 4.4.2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;car&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     recode</code></pre>
+<pre class="r"><code>library(car)
+
+# Compute VIF Values
+vif_values = vif(model)
+
+# Display the VIF Values
+vif_values</code></pre>
+<pre><code>##                   GVIF Df GVIF^(1/(2*Df))
+## LotArea       1.365710  1        1.168636
+## OverallQual   3.504365  1        1.871995
+## YearBuilt     5.597357  1        2.365873
+## GarageCars    2.017035  1        1.420223
+## TotalBsmtSF   1.830649  1        1.353015
+## GrLivArea     3.059618  1        1.749176
+## FullBath      2.436734  1        1.561004
+## Fireplaces    1.572621  1        1.254042
+## KitchenQual   2.985668  3        1.199979
+## Neighborhood 19.447435 24        1.063779</code></pre>
+</div>
+<div id="fit-interaction-model" class="section level2">
+<h2>Fit interaction model</h2>
+<pre class="r"><code># Fit a linear model
+model = lm(SalePrice ~ .^2, data = housing_data_clean)
+
+summary(model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = SalePrice ~ .^2, data = housing_data_clean)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -122624  -10298       0    9957  129181 
+## 
+## Coefficients: (39 not defined because of singularities)
+##                                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                        2.035e+07  1.575e+07   1.292 0.196636    
+## LotArea                            1.393e+02  6.933e+01   2.009 0.044732 *  
+## OverallQual                        7.639e+04  1.212e+05   0.630 0.528719    
+## YearBuilt                         -1.032e+04  7.790e+03  -1.325 0.185542    
+## GarageCars                        -3.129e+05  1.750e+05  -1.788 0.074080 .  
+## TotalBsmtSF                        3.372e+02  4.580e+02   0.736 0.461754    
+## GrLivArea                          4.049e+02  3.514e+02   1.152 0.249470    
+## FullBath                           2.666e+05  2.693e+05   0.990 0.322389    
+## Fireplaces                        -1.539e+05  2.714e+05  -0.567 0.570858    
+## KitchenQualFa                     -1.460e+06  1.213e+06  -1.204 0.228974    
+## KitchenQualGd                     -2.994e+06  9.773e+05  -3.063 0.002239 ** 
+## KitchenQualTA                     -3.033e+06  1.014e+06  -2.992 0.002831 ** 
+## NeighborhoodBlueste                2.535e+05  4.630e+05   0.547 0.584218    
+## NeighborhoodBrDale                -1.926e+07  2.043e+07  -0.943 0.345931    
+## NeighborhoodBrkSide               -1.882e+07  1.571e+07  -1.198 0.230979    
+## NeighborhoodClearCr               -1.902e+07  1.571e+07  -1.211 0.226318    
+## NeighborhoodCollgCr               -1.897e+07  1.571e+07  -1.208 0.227465    
+## NeighborhoodCrawfor               -2.019e+07  1.570e+07  -1.286 0.198576    
+## NeighborhoodEdwards               -1.916e+07  1.570e+07  -1.221 0.222381    
+## NeighborhoodGilbert               -1.994e+07  1.572e+07  -1.268 0.204987    
+## NeighborhoodIDOTRR                -1.893e+07  1.571e+07  -1.205 0.228453    
+## NeighborhoodMeadowV               -1.909e+07  1.796e+07  -1.063 0.288161    
+## NeighborhoodMitchel               -1.885e+07  1.571e+07  -1.200 0.230231    
+## NeighborhoodNAmes                 -1.972e+07  1.570e+07  -1.256 0.209249    
+## NeighborhoodNoRidge               -1.937e+07  1.614e+07  -1.200 0.230554    
+## NeighborhoodNPkVill               -1.620e+07  2.653e+07  -0.611 0.541600    
+## NeighborhoodNridgHt               -4.386e+07  1.600e+07  -2.740 0.006232 ** 
+## NeighborhoodNWAmes                -2.085e+07  1.572e+07  -1.327 0.184919    
+## NeighborhoodOldTown               -1.938e+07  1.570e+07  -1.234 0.217293    
+## NeighborhoodSawyer                -1.920e+07  1.570e+07  -1.223 0.221598    
+## NeighborhoodSawyerW               -1.885e+07  1.571e+07  -1.200 0.230278    
+## NeighborhoodSomerst               -2.018e+07  1.582e+07  -1.275 0.202394    
+## NeighborhoodStoneBr               -2.409e+07  1.581e+07  -1.524 0.127778    
+## NeighborhoodSWISU                 -2.241e+07  1.577e+07  -1.422 0.155410    
+## NeighborhoodTimber                -2.446e+07  1.576e+07  -1.552 0.120847    
+## NeighborhoodVeenker               -1.870e+07  2.621e+07  -0.713 0.475706    
+## LotArea:OverallQual                5.158e-01  1.528e-01   3.375 0.000764 ***
+## LotArea:YearBuilt                 -1.220e-02  1.064e-02  -1.147 0.251567    
+## LotArea:GarageCars                 1.039e-01  3.773e-01   0.275 0.783184    
+## LotArea:TotalBsmtSF               -9.044e-04  4.346e-04  -2.081 0.037635 *  
+## LotArea:GrLivArea                 -6.835e-04  5.055e-04  -1.352 0.176602    
+## LotArea:FullBath                  -5.901e-01  4.069e-01  -1.450 0.147310    
+## LotArea:Fireplaces                 1.272e-01  3.500e-01   0.364 0.716288    
+## LotArea:KitchenQualFa              2.143e+00  2.945e+00   0.728 0.466896    
+## LotArea:KitchenQualGd              1.658e+00  1.215e+00   1.365 0.172589    
+## LotArea:KitchenQualTA              1.497e+00  1.303e+00   1.149 0.250750    
+## LotArea:NeighborhoodBlueste       -1.598e+02  9.679e+01  -1.651 0.098949 .  
+## LotArea:NeighborhoodBrDale        -1.278e+02  8.259e+01  -1.548 0.121930    
+## LotArea:NeighborhoodBrkSide       -1.143e+02  6.593e+01  -1.734 0.083249 .  
+## LotArea:NeighborhoodClearCr       -1.165e+02  6.591e+01  -1.768 0.077394 .  
+## LotArea:NeighborhoodCollgCr       -1.177e+02  6.592e+01  -1.786 0.074339 .  
+## LotArea:NeighborhoodCrawfor       -1.167e+02  6.592e+01  -1.771 0.076810 .  
+## LotArea:NeighborhoodEdwards       -1.150e+02  6.592e+01  -1.745 0.081293 .  
+## LotArea:NeighborhoodGilbert       -1.158e+02  6.591e+01  -1.757 0.079138 .  
+## LotArea:NeighborhoodIDOTRR        -1.161e+02  6.594e+01  -1.760 0.078603 .  
+## LotArea:NeighborhoodMeadowV       -1.075e+02  7.113e+01  -1.512 0.130831    
+## LotArea:NeighborhoodMitchel       -1.175e+02  6.592e+01  -1.782 0.074955 .  
+## LotArea:NeighborhoodNAmes         -1.166e+02  6.591e+01  -1.769 0.077100 .  
+## LotArea:NeighborhoodNoRidge       -1.144e+02  6.591e+01  -1.736 0.082914 .  
+## LotArea:NeighborhoodNPkVill       -1.166e+02  8.168e+01  -1.428 0.153649    
+## LotArea:NeighborhoodNridgHt       -1.136e+02  6.592e+01  -1.724 0.085049 .  
+## LotArea:NeighborhoodNWAmes        -1.154e+02  6.592e+01  -1.751 0.080200 .  
+## LotArea:NeighborhoodOldTown       -1.159e+02  6.592e+01  -1.758 0.078996 .  
+## LotArea:NeighborhoodSawyer        -1.168e+02  6.592e+01  -1.772 0.076596 .  
+## LotArea:NeighborhoodSawyerW       -1.152e+02  6.593e+01  -1.748 0.080806 .  
+## LotArea:NeighborhoodSomerst       -1.141e+02  6.592e+01  -1.731 0.083765 .  
+## LotArea:NeighborhoodStoneBr       -1.119e+02  6.592e+01  -1.697 0.089989 .  
+## LotArea:NeighborhoodSWISU         -1.233e+02  6.599e+01  -1.869 0.061928 .  
+## LotArea:NeighborhoodTimber        -1.157e+02  6.591e+01  -1.756 0.079426 .  
+## LotArea:NeighborhoodVeenker       -1.209e+02  6.629e+01  -1.824 0.068460 .  
+## OverallQual:YearBuilt             -4.078e+01  5.967e+01  -0.683 0.494524    
+## OverallQual:GarageCars             1.580e+03  1.615e+03   0.979 0.327987    
+## OverallQual:TotalBsmtSF            3.610e+00  3.018e+00   1.196 0.231848    
+## OverallQual:GrLivArea             -7.289e-01  2.697e+00  -0.270 0.787042    
+## OverallQual:FullBath               3.455e+03  2.434e+03   1.419 0.156088    
+## OverallQual:Fireplaces            -2.839e+03  1.780e+03  -1.595 0.110900    
+## OverallQual:KitchenQualFa         -1.354e+03  7.361e+03  -0.184 0.854063    
+## OverallQual:KitchenQualGd         -1.267e+03  5.041e+03  -0.251 0.801657    
+## OverallQual:KitchenQualTA         -2.000e+03  5.462e+03  -0.366 0.714283    
+## OverallQual:NeighborhoodBlueste           NA         NA      NA       NA    
+## OverallQual:NeighborhoodBrDale    -4.508e+03  4.748e+04  -0.095 0.924377    
+## OverallQual:NeighborhoodBrkSide    7.873e+01  2.312e+04   0.003 0.997284    
+## OverallQual:NeighborhoodClearCr   -4.181e+03  2.372e+04  -0.176 0.860114    
+## OverallQual:NeighborhoodCollgCr   -5.776e+03  2.273e+04  -0.254 0.799486    
+## OverallQual:NeighborhoodCrawfor    1.271e+04  2.306e+04   0.551 0.581618    
+## OverallQual:NeighborhoodEdwards   -4.292e+03  2.280e+04  -0.188 0.850687    
+## OverallQual:NeighborhoodGilbert   -2.724e+03  2.290e+04  -0.119 0.905334    
+## OverallQual:NeighborhoodIDOTRR     8.552e+03  2.326e+04   0.368 0.713149    
+## OverallQual:NeighborhoodMeadowV   -6.129e+03  4.048e+04  -0.151 0.879689    
+## OverallQual:NeighborhoodMitchel   -2.572e+03  2.326e+04  -0.111 0.911976    
+## OverallQual:NeighborhoodNAmes      1.219e+03  2.270e+04   0.054 0.957172    
+## OverallQual:NeighborhoodNoRidge    2.116e+03  2.400e+04   0.088 0.929771    
+## OverallQual:NeighborhoodNPkVill           NA         NA      NA       NA    
+## OverallQual:NeighborhoodNridgHt    9.252e+03  2.303e+04   0.402 0.687944    
+## OverallQual:NeighborhoodNWAmes    -5.049e+03  2.288e+04  -0.221 0.825359    
+## OverallQual:NeighborhoodOldTown   -4.005e+02  2.302e+04  -0.017 0.986124    
+## OverallQual:NeighborhoodSawyer     1.624e+03  2.324e+04   0.070 0.944298    
+## OverallQual:NeighborhoodSawyerW    9.413e+03  2.292e+04   0.411 0.681406    
+## OverallQual:NeighborhoodSomerst   -1.057e+03  2.274e+04  -0.046 0.962929    
+## OverallQual:NeighborhoodStoneBr    1.792e+04  2.445e+04   0.733 0.463925    
+## OverallQual:NeighborhoodSWISU      4.015e+03  2.334e+04   0.172 0.863477    
+## OverallQual:NeighborhoodTimber    -4.634e+03  2.354e+04  -0.197 0.843996    
+## OverallQual:NeighborhoodVeenker    1.045e+04  1.426e+05   0.073 0.941610    
+## YearBuilt:GarageCars               1.382e+02  8.297e+01   1.665 0.096177 .  
+## YearBuilt:TotalBsmtSF             -1.479e-01  1.984e-01  -0.746 0.456003    
+## YearBuilt:GrLivArea               -1.751e-01  1.663e-01  -1.053 0.292775    
+## YearBuilt:FullBath                -1.160e+02  1.350e+02  -0.859 0.390453    
+## YearBuilt:Fireplaces               7.327e+01  1.366e+02   0.536 0.591867    
+## YearBuilt:KitchenQualFa            7.597e+02  6.167e+02   1.232 0.218260    
+## YearBuilt:KitchenQualGd            1.557e+03  4.939e+02   3.154 0.001654 ** 
+## YearBuilt:KitchenQualTA            1.559e+03  5.137e+02   3.034 0.002465 ** 
+## YearBuilt:NeighborhoodBlueste             NA         NA      NA       NA    
+## YearBuilt:NeighborhoodBrDale       9.820e+03  1.021e+04   0.962 0.336340    
+## YearBuilt:NeighborhoodBrkSide      9.486e+03  7.765e+03   1.222 0.222106    
+## YearBuilt:NeighborhoodClearCr      9.603e+03  7.770e+03   1.236 0.216741    
+## YearBuilt:NeighborhoodCollgCr      9.602e+03  7.766e+03   1.236 0.216527    
+## YearBuilt:NeighborhoodCrawfor      1.023e+04  7.761e+03   1.318 0.187840    
+## YearBuilt:NeighborhoodEdwards      9.734e+03  7.760e+03   1.254 0.209978    
+## YearBuilt:NeighborhoodGilbert      1.012e+04  7.773e+03   1.302 0.193039    
+## YearBuilt:NeighborhoodIDOTRR       9.574e+03  7.768e+03   1.232 0.218018    
+## YearBuilt:NeighborhoodMeadowV      9.721e+03  8.950e+03   1.086 0.277626    
+## YearBuilt:NeighborhoodMitchel      9.577e+03  7.765e+03   1.233 0.217715    
+## YearBuilt:NeighborhoodNAmes        9.999e+03  7.761e+03   1.288 0.197865    
+## YearBuilt:NeighborhoodNoRidge      9.643e+03  7.990e+03   1.207 0.227733    
+## YearBuilt:NeighborhoodNPkVill      8.344e+03  1.355e+04   0.616 0.538235    
+## YearBuilt:NeighborhoodNridgHt      2.198e+04  7.915e+03   2.777 0.005579 ** 
+## YearBuilt:NeighborhoodNWAmes       1.060e+04  7.773e+03   1.363 0.173056    
+## YearBuilt:NeighborhoodOldTown      9.801e+03  7.760e+03   1.263 0.206859    
+## YearBuilt:NeighborhoodSawyer       9.757e+03  7.763e+03   1.257 0.209082    
+## YearBuilt:NeighborhoodSawyerW      9.529e+03  7.765e+03   1.227 0.219988    
+## YearBuilt:NeighborhoodSomerst      1.024e+04  7.823e+03   1.310 0.190598    
+## YearBuilt:NeighborhoodStoneBr      1.210e+04  7.818e+03   1.548 0.121853    
+## YearBuilt:NeighborhoodSWISU        1.144e+04  7.798e+03   1.467 0.142712    
+## YearBuilt:NeighborhoodTimber       1.241e+04  7.793e+03   1.593 0.111524    
+## YearBuilt:NeighborhoodVeenker      9.354e+03  1.305e+04   0.717 0.473795    
+## GarageCars:TotalBsmtSF            -4.231e-02  4.348e+00  -0.010 0.992238    
+## GarageCars:GrLivArea               2.594e+00  4.109e+00   0.631 0.527889    
+## GarageCars:FullBath               -4.460e+03  3.426e+03  -1.302 0.193199    
+## GarageCars:Fireplaces              1.665e+03  2.799e+03   0.595 0.552153    
+## GarageCars:KitchenQualFa          -4.541e+04  1.288e+04  -3.526 0.000438 ***
+## GarageCars:KitchenQualGd          -3.681e+04  8.923e+03  -4.126 3.96e-05 ***
+## GarageCars:KitchenQualTA          -3.976e+04  9.779e+03  -4.065 5.12e-05 ***
+## GarageCars:NeighborhoodBlueste            NA         NA      NA       NA    
+## GarageCars:NeighborhoodBrDale      8.443e+04  5.767e+04   1.464 0.143472    
+## GarageCars:NeighborhoodBrkSide     8.128e+04  5.372e+04   1.513 0.130525    
+## GarageCars:NeighborhoodClearCr     1.101e+05  5.642e+04   1.951 0.051246 .  
+## GarageCars:NeighborhoodCollgCr     8.461e+04  5.326e+04   1.589 0.112440    
+## GarageCars:NeighborhoodCrawfor     7.684e+04  5.375e+04   1.430 0.153120    
+## GarageCars:NeighborhoodEdwards     8.173e+04  5.343e+04   1.530 0.126360    
+## GarageCars:NeighborhoodGilbert     8.419e+04  5.463e+04   1.541 0.123580    
+## GarageCars:NeighborhoodIDOTRR      8.560e+04  5.393e+04   1.587 0.112742    
+## GarageCars:NeighborhoodMeadowV     8.137e+04  5.613e+04   1.450 0.147409    
+## GarageCars:NeighborhoodMitchel     8.354e+04  5.344e+04   1.563 0.118257    
+## GarageCars:NeighborhoodNAmes       7.833e+04  5.329e+04   1.470 0.141862    
+## GarageCars:NeighborhoodNoRidge     9.967e+04  5.406e+04   1.844 0.065468 .  
+## GarageCars:NeighborhoodNPkVill            NA         NA      NA       NA    
+## GarageCars:NeighborhoodNridgHt     4.461e+04  5.408e+04   0.825 0.409595    
+## GarageCars:NeighborhoodNWAmes      6.782e+04  5.859e+04   1.158 0.247288    
+## GarageCars:NeighborhoodOldTown     8.776e+04  5.363e+04   1.636 0.102073    
+## GarageCars:NeighborhoodSawyer      7.561e+04  5.350e+04   1.413 0.157853    
+## GarageCars:NeighborhoodSawyerW     6.671e+04  5.369e+04   1.243 0.214287    
+## GarageCars:NeighborhoodSomerst     4.545e+04  5.353e+04   0.849 0.396050    
+## GarageCars:NeighborhoodStoneBr     2.395e+04  5.854e+04   0.409 0.682581    
+## GarageCars:NeighborhoodSWISU       7.945e+04  5.422e+04   1.465 0.143088    
+## GarageCars:NeighborhoodTimber      4.499e+04  5.465e+04   0.823 0.410567    
+## GarageCars:NeighborhoodVeenker     1.759e+05  1.679e+05   1.048 0.294884    
+## TotalBsmtSF:GrLivArea             -3.133e-03  7.276e-03  -0.431 0.666864    
+## TotalBsmtSF:FullBath              -1.131e+01  5.927e+00  -1.909 0.056568 .  
+## TotalBsmtSF:Fireplaces             3.954e+00  4.361e+00   0.907 0.364845    
+## TotalBsmtSF:KitchenQualFa         -1.105e+01  2.172e+01  -0.509 0.610910    
+## TotalBsmtSF:KitchenQualGd         -4.366e+00  1.080e+01  -0.404 0.686197    
+## TotalBsmtSF:KitchenQualTA         -1.091e+01  1.296e+01  -0.842 0.400147    
+## TotalBsmtSF:NeighborhoodBlueste           NA         NA      NA       NA    
+## TotalBsmtSF:NeighborhoodBrDale     2.735e+02  6.248e+02   0.438 0.661687    
+## TotalBsmtSF:NeighborhoodBrkSide   -2.623e+00  2.402e+02  -0.011 0.991288    
+## TotalBsmtSF:NeighborhoodClearCr    2.213e+01  2.400e+02   0.092 0.926559    
+## TotalBsmtSF:NeighborhoodCollgCr    5.458e+00  2.394e+02   0.023 0.981814    
+## TotalBsmtSF:NeighborhoodCrawfor   -2.423e+01  2.399e+02  -0.101 0.919593    
+## TotalBsmtSF:NeighborhoodEdwards   -7.828e+00  2.395e+02  -0.033 0.973934    
+## TotalBsmtSF:NeighborhoodGilbert    4.348e-01  2.395e+02   0.002 0.998552    
+## TotalBsmtSF:NeighborhoodIDOTRR     1.171e+01  2.408e+02   0.049 0.961227    
+## TotalBsmtSF:NeighborhoodMeadowV   -4.661e+01  2.473e+02  -0.189 0.850513    
+## TotalBsmtSF:NeighborhoodMitchel    9.797e+00  2.397e+02   0.041 0.967400    
+## TotalBsmtSF:NeighborhoodNAmes     -1.741e+01  2.395e+02  -0.073 0.942040    
+## TotalBsmtSF:NeighborhoodNoRidge   -1.395e+00  2.396e+02  -0.006 0.995354    
+## TotalBsmtSF:NeighborhoodNPkVill   -7.055e+01  3.272e+02  -0.216 0.829325    
+## TotalBsmtSF:NeighborhoodNridgHt    1.548e+01  2.395e+02   0.065 0.948453    
+## TotalBsmtSF:NeighborhoodNWAmes    -1.188e+01  2.394e+02  -0.050 0.960439    
+## TotalBsmtSF:NeighborhoodOldTown   -2.086e+01  2.399e+02  -0.087 0.930702    
+## TotalBsmtSF:NeighborhoodSawyer    -6.007e+00  2.396e+02  -0.025 0.980004    
+## TotalBsmtSF:NeighborhoodSawyerW    8.104e+00  2.395e+02   0.034 0.973008    
+## TotalBsmtSF:NeighborhoodSomerst    1.622e+01  2.395e+02   0.068 0.946023    
+## TotalBsmtSF:NeighborhoodStoneBr    6.119e+01  2.401e+02   0.255 0.798877    
+## TotalBsmtSF:NeighborhoodSWISU     -6.594e+01  2.416e+02  -0.273 0.784928    
+## TotalBsmtSF:NeighborhoodTimber     3.629e+01  2.399e+02   0.151 0.879779    
+## TotalBsmtSF:NeighborhoodVeenker    2.381e+01  3.779e+02   0.063 0.949770    
+## GrLivArea:FullBath                 4.080e+00  4.836e+00   0.844 0.398985    
+## GrLivArea:Fireplaces               1.315e+01  4.442e+00   2.960 0.003143 ** 
+## GrLivArea:KitchenQualFa            2.211e+00  2.024e+01   0.109 0.913021    
+## GrLivArea:KitchenQualGd            2.928e+01  1.077e+01   2.720 0.006636 ** 
+## GrLivArea:KitchenQualTA            2.511e+01  1.211e+01   2.073 0.038441 *  
+## GrLivArea:NeighborhoodBlueste             NA         NA      NA       NA    
+## GrLivArea:NeighborhoodBrDale      -2.607e+02  4.802e+02  -0.543 0.587332    
+## GrLivArea:NeighborhoodBrkSide     -4.445e+01  1.168e+02  -0.380 0.703649    
+## GrLivArea:NeighborhoodClearCr     -3.219e+01  1.180e+02  -0.273 0.785081    
+## GrLivArea:NeighborhoodCollgCr     -1.691e+01  1.157e+02  -0.146 0.883880    
+## GrLivArea:NeighborhoodCrawfor     -5.202e+01  1.164e+02  -0.447 0.655106    
+## GrLivArea:NeighborhoodEdwards     -8.930e+01  1.162e+02  -0.768 0.442500    
+## GrLivArea:NeighborhoodGilbert     -3.707e+01  1.160e+02  -0.319 0.749478    
+## GrLivArea:NeighborhoodIDOTRR      -4.930e+01  1.177e+02  -0.419 0.675392    
+## GrLivArea:NeighborhoodMeadowV     -9.248e+01  1.215e+02  -0.761 0.446599    
+## GrLivArea:NeighborhoodMitchel     -6.110e+01  1.164e+02  -0.525 0.599716    
+## GrLivArea:NeighborhoodNAmes       -6.525e+01  1.159e+02  -0.563 0.573500    
+## GrLivArea:NeighborhoodNoRidge     -3.221e+01  1.162e+02  -0.277 0.781667    
+## GrLivArea:NeighborhoodNPkVill     -7.109e+01  3.531e+02  -0.201 0.840473    
+## GrLivArea:NeighborhoodNridgHt      3.065e+01  1.161e+02   0.264 0.791874    
+## GrLivArea:NeighborhoodNWAmes      -3.581e+01  1.158e+02  -0.309 0.757235    
+## GrLivArea:NeighborhoodOldTown     -6.858e+01  1.166e+02  -0.588 0.556456    
+## GrLivArea:NeighborhoodSawyer      -6.569e+01  1.165e+02  -0.564 0.572882    
+## GrLivArea:NeighborhoodSawyerW     -2.957e+01  1.159e+02  -0.255 0.798705    
+## GrLivArea:NeighborhoodSomerst     -1.816e+00  1.161e+02  -0.016 0.987529    
+## GrLivArea:NeighborhoodStoneBr     -1.698e+01  1.180e+02  -0.144 0.885642    
+## GrLivArea:NeighborhoodSWISU       -2.461e+01  1.172e+02  -0.210 0.833712    
+## GrLivArea:NeighborhoodTimber      -2.270e+01  1.161e+02  -0.195 0.845045    
+## GrLivArea:NeighborhoodVeenker     -2.921e+01  3.597e+02  -0.081 0.935299    
+## FullBath:Fireplaces                6.060e+02  3.898e+03   0.155 0.876479    
+## FullBath:KitchenQualFa            -2.200e+04  1.789e+04  -1.230 0.219047    
+## FullBath:KitchenQualGd            -3.221e+04  1.063e+04  -3.030 0.002501 ** 
+## FullBath:KitchenQualTA            -3.087e+04  1.117e+04  -2.764 0.005808 ** 
+## FullBath:NeighborhoodBlueste              NA         NA      NA       NA    
+## FullBath:NeighborhoodBrDale        7.317e+03  5.804e+04   0.126 0.899695    
+## FullBath:NeighborhoodBrkSide      -1.290e+04  2.170e+04  -0.595 0.552210    
+## FullBath:NeighborhoodClearCr      -1.444e+04  2.310e+04  -0.625 0.532093    
+## FullBath:NeighborhoodCollgCr       2.739e+02  1.748e+04   0.016 0.987502    
+## FullBath:NeighborhoodCrawfor      -1.836e+04  1.969e+04  -0.933 0.351121    
+## FullBath:NeighborhoodEdwards       6.731e+03  1.785e+04   0.377 0.706246    
+## FullBath:NeighborhoodGilbert      -1.960e+04  3.874e+04  -0.506 0.613011    
+## FullBath:NeighborhoodIDOTRR       -1.897e+04  2.334e+04  -0.813 0.416619    
+## FullBath:NeighborhoodMeadowV       1.694e+03  4.122e+04   0.041 0.967227    
+## FullBath:NeighborhoodMitchel      -9.492e+03  1.813e+04  -0.523 0.600771    
+## FullBath:NeighborhoodNAmes        -1.104e+04  1.703e+04  -0.648 0.516877    
+## FullBath:NeighborhoodNoRidge       1.165e+05  2.950e+04   3.948 8.37e-05 ***
+## FullBath:NeighborhoodNPkVill              NA         NA      NA       NA    
+## FullBath:NeighborhoodNridgHt      -3.922e+04  1.933e+04  -2.029 0.042673 *  
+## FullBath:NeighborhoodNWAmes       -2.112e+04  1.703e+04  -1.240 0.215225    
+## FullBath:NeighborhoodOldTown      -1.506e+04  1.954e+04  -0.771 0.440947    
+## FullBath:NeighborhoodSawyer       -1.173e+04  1.825e+04  -0.643 0.520647    
+## FullBath:NeighborhoodSawyerW      -1.154e+04  1.729e+04  -0.667 0.504787    
+## FullBath:NeighborhoodSomerst      -2.640e+04  1.881e+04  -1.403 0.160775    
+## FullBath:NeighborhoodStoneBr      -9.573e+03  2.189e+04  -0.437 0.661895    
+## FullBath:NeighborhoodSWISU        -1.689e+04  2.082e+04  -0.811 0.417355    
+## FullBath:NeighborhoodTimber       -4.678e+04  3.334e+04  -1.403 0.160867    
+## FullBath:NeighborhoodVeenker       3.834e+02  2.873e+04   0.013 0.989354    
+## Fireplaces:KitchenQualFa          -1.807e+04  1.486e+04  -1.216 0.224316    
+## Fireplaces:KitchenQualGd          -1.598e+04  7.825e+03  -2.042 0.041373 *  
+## Fireplaces:KitchenQualTA          -1.817e+04  8.329e+03  -2.181 0.029359 *  
+## Fireplaces:NeighborhoodBlueste            NA         NA      NA       NA    
+## Fireplaces:NeighborhoodBrDale      2.783e+04  3.799e+04   0.732 0.464044    
+## Fireplaces:NeighborhoodBrkSide     2.225e+04  2.984e+04   0.746 0.456033    
+## Fireplaces:NeighborhoodClearCr     1.157e+04  2.995e+04   0.386 0.699384    
+## Fireplaces:NeighborhoodCollgCr     1.633e+04  2.849e+04   0.573 0.566678    
+## Fireplaces:NeighborhoodCrawfor     2.819e+04  3.001e+04   0.939 0.347761    
+## Fireplaces:NeighborhoodEdwards     3.384e+04  2.934e+04   1.154 0.248929    
+## Fireplaces:NeighborhoodGilbert     1.855e+04  2.930e+04   0.633 0.526763    
+## Fireplaces:NeighborhoodIDOTRR      2.258e+04  3.106e+04   0.727 0.467334    
+## Fireplaces:NeighborhoodMeadowV     4.514e+04  3.543e+04   1.274 0.202933    
+## Fireplaces:NeighborhoodMitchel     2.661e+04  2.902e+04   0.917 0.359299    
+## Fireplaces:NeighborhoodNAmes       2.346e+04  2.887e+04   0.813 0.416659    
+## Fireplaces:NeighborhoodNoRidge     3.899e+04  3.168e+04   1.231 0.218664    
+## Fireplaces:NeighborhoodNPkVill     1.032e+04  3.781e+04   0.273 0.784931    
+## Fireplaces:NeighborhoodNridgHt     1.817e+04  2.915e+04   0.623 0.533175    
+## Fireplaces:NeighborhoodNWAmes      2.076e+04  2.901e+04   0.715 0.474472    
+## Fireplaces:NeighborhoodOldTown     3.015e+04  3.000e+04   1.005 0.315037    
+## Fireplaces:NeighborhoodSawyer      2.905e+04  2.925e+04   0.993 0.320843    
+## Fireplaces:NeighborhoodSawyerW     1.172e+04  2.903e+04   0.404 0.686605    
+## Fireplaces:NeighborhoodSomerst     1.126e+04  2.884e+04   0.390 0.696332    
+## Fireplaces:NeighborhoodStoneBr     3.183e+04  3.156e+04   1.008 0.313463    
+## Fireplaces:NeighborhoodSWISU       1.117e+04  3.077e+04   0.363 0.716628    
+## Fireplaces:NeighborhoodTimber      2.927e+04  2.970e+04   0.986 0.324456    
+## Fireplaces:NeighborhoodVeenker     2.579e+04  9.622e+04   0.268 0.788711    
+## KitchenQualFa:NeighborhoodBlueste         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodBlueste         NA         NA      NA       NA    
+## KitchenQualTA:NeighborhoodBlueste         NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodBrDale          NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodBrDale  -2.591e+04  9.363e+04  -0.277 0.782015    
+## KitchenQualTA:NeighborhoodBrDale          NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodBrkSide  8.055e+04  8.587e+04   0.938 0.348398    
+## KitchenQualGd:NeighborhoodBrkSide  5.649e+04  7.107e+04   0.795 0.426873    
+## KitchenQualTA:NeighborhoodBrkSide  1.116e+05  8.282e+04   1.347 0.178188    
+## KitchenQualFa:NeighborhoodClearCr         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodClearCr -2.863e+03  7.135e+04  -0.040 0.967999    
+## KitchenQualTA:NeighborhoodClearCr  4.674e+04  7.904e+04   0.591 0.554400    
+## KitchenQualFa:NeighborhoodCollgCr         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodCollgCr -2.474e+04  5.617e+04  -0.440 0.659695    
+## KitchenQualTA:NeighborhoodCollgCr  3.717e+04  7.230e+04   0.514 0.607305    
+## KitchenQualFa:NeighborhoodCrawfor  3.091e+04  7.890e+04   0.392 0.695344    
+## KitchenQualGd:NeighborhoodCrawfor -4.978e+03  6.276e+04  -0.079 0.936789    
+## KitchenQualTA:NeighborhoodCrawfor  4.790e+04  7.452e+04   0.643 0.520487    
+## KitchenQualFa:NeighborhoodEdwards -1.263e+04  7.663e+04  -0.165 0.869160    
+## KitchenQualGd:NeighborhoodEdwards -3.183e+04  5.973e+04  -0.533 0.594229    
+## KitchenQualTA:NeighborhoodEdwards  1.206e+04  7.292e+04   0.165 0.868712    
+## KitchenQualFa:NeighborhoodGilbert         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodGilbert -7.157e+04  6.305e+04  -1.135 0.256545    
+## KitchenQualTA:NeighborhoodGilbert -1.766e+04  7.668e+04  -0.230 0.817866    
+## KitchenQualFa:NeighborhoodIDOTRR  -2.856e+04  2.174e+04  -1.314 0.189103    
+## KitchenQualGd:NeighborhoodIDOTRR  -3.291e+04  9.121e+04  -0.361 0.718273    
+## KitchenQualTA:NeighborhoodIDOTRR          NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodMeadowV         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodMeadowV -7.274e+04  7.576e+04  -0.960 0.337161    
+## KitchenQualTA:NeighborhoodMeadowV -2.978e+04  8.635e+04  -0.345 0.730219    
+## KitchenQualFa:NeighborhoodMitchel         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodMitchel -4.329e+04  9.048e+04  -0.478 0.632410    
+## KitchenQualTA:NeighborhoodMitchel         NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodNAmes    4.399e+04  7.847e+04   0.561 0.575174    
+## KitchenQualGd:NeighborhoodNAmes    5.317e+03  5.957e+04   0.089 0.928896    
+## KitchenQualTA:NeighborhoodNAmes    5.374e+04  7.253e+04   0.741 0.458871    
+## KitchenQualFa:NeighborhoodNoRidge         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodNoRidge -5.923e+04  5.956e+04  -0.994 0.320205    
+## KitchenQualTA:NeighborhoodNoRidge  3.639e+04  7.762e+04   0.469 0.639307    
+## KitchenQualFa:NeighborhoodNPkVill         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodNPkVill -5.732e+04  1.022e+05  -0.561 0.575033    
+## KitchenQualTA:NeighborhoodNPkVill         NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodNridgHt         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodNridgHt -3.486e+03  5.564e+04  -0.063 0.950057    
+## KitchenQualTA:NeighborhoodNridgHt         NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodNWAmes          NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodNWAmes  -2.772e+04  6.004e+04  -0.462 0.644362    
+## KitchenQualTA:NeighborhoodNWAmes   2.130e+04  7.318e+04   0.291 0.771047    
+## KitchenQualFa:NeighborhoodOldTown  5.737e+04  8.390e+04   0.684 0.494219    
+## KitchenQualGd:NeighborhoodOldTown  5.151e+04  7.087e+04   0.727 0.467487    
+## KitchenQualTA:NeighborhoodOldTown  9.156e+04  8.125e+04   1.127 0.260003    
+## KitchenQualFa:NeighborhoodSawyer   2.467e+04  3.464e+04   0.712 0.476519    
+## KitchenQualGd:NeighborhoodSawyer  -4.762e+04  9.038e+04  -0.527 0.598402    
+## KitchenQualTA:NeighborhoodSawyer          NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodSawyerW         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodSawyerW -5.172e+04  9.035e+04  -0.572 0.567147    
+## KitchenQualTA:NeighborhoodSawyerW         NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodSomerst         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodSomerst -4.909e+04  5.597e+04  -0.877 0.380633    
+## KitchenQualTA:NeighborhoodSomerst  1.790e+04  7.242e+04   0.247 0.804785    
+## KitchenQualFa:NeighborhoodStoneBr         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodStoneBr -3.370e+04  5.720e+04  -0.589 0.555839    
+## KitchenQualTA:NeighborhoodStoneBr         NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodSWISU           NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodSWISU   -5.638e+04  9.099e+04  -0.620 0.535664    
+## KitchenQualTA:NeighborhoodSWISU           NA         NA      NA       NA    
+## KitchenQualFa:NeighborhoodTimber          NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodTimber  -2.679e+04  5.682e+04  -0.471 0.637402    
+## KitchenQualTA:NeighborhoodTimber   2.956e+04  7.303e+04   0.405 0.685670    
+## KitchenQualFa:NeighborhoodVeenker         NA         NA      NA       NA    
+## KitchenQualGd:NeighborhoodVeenker -1.996e+04  2.286e+05  -0.087 0.930449    
+## KitchenQualTA:NeighborhoodVeenker         NA         NA      NA       NA    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 22340 on 1147 degrees of freedom
+## Multiple R-squared:  0.9378, Adjusted R-squared:  0.9209 
+## F-statistic: 55.46 on 312 and 1147 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>
