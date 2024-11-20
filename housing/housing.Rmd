@@ -1,0 +1,62 @@
+---
+title: "housing"
+author: "Curtis Easton"
+date: "2024-11-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+
+# Load the dataset
+housing_data = read.csv("train.csv")
+
+# View the dataset structure
+str(housing_data)
+
+# Basic data cleaning (remove rows with missing SalePrice or predictors)
+housing_data_clean = housing_data %>%
+  filter(!is.na(SalePrice)) %>%  # Ensure no missing SalePrice
+  select(SalePrice, LotArea, OverallQual, YearBuilt, GarageCars, TotalBsmtSF, 
+         GrLivArea, FullBath, Fireplaces, KitchenQual, Neighborhood) %>%  # Select at least 10 columns
+  na.omit()  # Remove rows with missing values
+
+# Convert categorical predictors to factors
+housing_data_clean$KitchenQual = as.factor(housing_data_clean$KitchenQual)  # Kitchen Quality
+housing_data_clean$Neighborhood = as.factor(housing_data_clean$Neighborhood)  # Neighborhood
+
+# Fit a linear model
+model = lm(SalePrice ~ ., data = housing_data_clean)
+
+# Summary of the model
+summary(model)
+
+str(housing_data_clean)
+
+```
+
+## Including Plots
+
+
+```{r }
+
+# Scatter plot: GrLivArea vs SalePrice
+plot(housing_data_clean$GrLivArea, housing_data_clean$SalePrice,
+     main = "GrLivArea vs SalePrice",
+     xlab = "Above-Ground Living Area (GrLivArea)",
+     ylab = "Sale Price",
+     col = "blue", pch = 19, cex = 0.5)
+
+```
+

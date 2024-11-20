@@ -1,0 +1,103 @@
+---
+title: "wine"
+author: "Curtis Easton"
+date: "2024-11-20"
+output: html_document
+---
+
+```{r setup}
+
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+```
+
+```{r}
+
+# Load Necessary Libraries
+library(dplyr) # For data manipulation
+
+# Load the Red Wine Data
+red_wine = read.csv("winequality-red.csv", sep = ";")
+
+# Load the White Wine Data
+white_wine = read.csv("winequality-white.csv", sep = ";")
+
+# Add a Categorical Variable for Wine Type
+red_wine$type = "Red"
+white_wine$type = "White"
+
+# Combine the Two Datasets
+wine_data = bind_rows(red_wine, white_wine)
+
+
+# Convert 'type' to a Factor
+wine_data$type = as.factor(wine_data$type)
+
+# Categorize the 'alcohol' Predictor
+wine_data$alcohol_category = cut(
+  wine_data$alcohol,
+  breaks = c(-Inf, 10, 12, Inf), # Define the thresholds for "Low", "Medium", "High"
+  labels = c("Low", "Medium", "High")
+)
+
+# Convert to a Factor
+wine_data$alcohol_category = as.factor(wine_data$alcohol_category)
+
+# View(wine_data)
+
+```
+
+
+
+
+
+```{r}
+
+model = lm(quality ~ ., data = wine_data)
+summary(model)
+
+```
+
+```{r}
+if (!require(car)) install.packages("car")
+library(car)
+
+# Compute VIF Values
+vif_values = vif(model)
+
+# Display the VIF Values
+vif_values
+
+
+```
+
+```{r}
+
+
+model = lm(quality ~ .^2, data = wine_data)
+summary(model)
+
+
+```
+
+## Including Plots
+
+
+```{r}
+
+# Scatter plot: Volatile Acidity vs Quality
+plot(wine_data$volatile.acidity, wine_data$quality,
+     main = "Volatile Acidity vs Wine Quality",
+     xlab = "Volatile Acidity",
+     ylab = "Wine Quality",
+     col = "blue", pch = 19, cex = 0.5)
+
+# Scatter plot: Residual Sugar vs Quality
+plot(wine_data$residual.sugar, wine_data$quality,
+     main = "Residual Sugar vs Wine Quality",
+     xlab = "Residual Sugar",
+     ylab = "Wine Quality",
+     col = "green", pch = 19, cex = 0.5)
+```
+
+
