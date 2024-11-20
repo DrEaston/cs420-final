@@ -69,6 +69,9 @@ summary(model)
 
 ```
 
+## VIF Values
+
+
 ```{r}
 if (!require(car)) install.packages("car")
 library(car)

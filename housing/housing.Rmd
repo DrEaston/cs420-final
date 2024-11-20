@@ -57,6 +57,9 @@ summary(model)
 str(housing_data_clean)
 
 ```
+
+## VIF values
+
 ```{r}
 
 if (!require(car)) install.packages("car")
