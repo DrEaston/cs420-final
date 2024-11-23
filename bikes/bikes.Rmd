@@ -1,0 +1,94 @@
+---
+title: "wine"
+author: "Curtis Easton"
+date: "2024-11-20"
+output: html_document
+---
+
+```{r setup}
+
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+```
+
+## load data
+
+```{r}
+
+# Load Necessary Libraries
+library(dplyr) # For data manipulation
+
+# Load the Red Wine Data
+bikes = read.csv("hour.csv", sep = ",")
+    
+bikes = bikes %>% select(-dteday)
+bikes = bikes %>% select(-instant)
+bikes = bikes %>% select(-casual)
+bikes = bikes %>% select(-registered)
+bikes = bikes %>% select(-workingday)
+bikes = bikes %>% select(-atemp)
+
+
+bikes$season = as.factor(bikes$season)          # Season (1: Winter, 2: Spring, etc.)
+bikes$holiday = as.factor(bikes$holiday)        # Holiday (1: Yes, 0: No)
+bikes$weathersit = as.factor(bikes$weathersit)  # Weather Situation (1 to 4)
+bikes$weekday = as.factor(bikes$weekday)        # Day of the Week (0: Sunday, 1: Monday, etc.)
+bikes$mnth = as.factor(bikes$mnth)              # Month (1: January, 2: February, etc.)
+bikes$yr = as.factor(bikes$yr)   
+
+str(bikes)
+View(bikes)
+
+
+```
+
+## Data types
+
+
+```{r}
+
+```
+
+
+
+## Fit additive Model
+
+```{r}
+
+model = lm(cnt ~ ., data = bikes)
+summary(model)
+
+```
+
+## VIF Values
+
+
+```{r}
+
+alias(model)
+
+if (!require(car)) install.packages("car")
+library(car)
+
+# Compute VIF Values
+vif_values = vif(model)
+
+# Display the VIF Values
+vif_values
+
+
+```
+
+## Fit interaction model
+
+```{r}
+# 
+# 
+# model = lm(quality ~ .^2, data = wine_data)
+# summary(model)
+
+
+```
+
+## Including Plots
+

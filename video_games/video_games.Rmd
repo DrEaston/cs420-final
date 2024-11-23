@@ -1,0 +1,89 @@
+---
+title: "wine"
+author: "Curtis Easton"
+date: "2024-11-20"
+output: html_document
+---
+
+```{r setup}
+
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+```
+
+## load data
+
+```{r}
+
+# Load Necessary Libraries
+library(dplyr) # For data manipulation
+
+# Load the Red Wine Data
+vgsales = read.csv("vgsales.csv", sep = ",")
+
+vgsales = vgsales %>% sample_n(2000)
+
+vgsales = vgsales %>% select(-Name)
+
+
+
+
+```
+
+## Data types
+
+
+```{r}
+
+str(vgsales)
+
+```
+
+
+
+## Fit additive Model
+
+```{r}
+
+model = lm(Global_Sales ~ ., data = vgsales)
+summary(model)
+
+```
+
+## VIF Values
+
+
+<!-- ```{r} -->
+<!-- if (!require(car)) install.packages("car") -->
+<!-- library(car) -->
+
+<!-- # Compute VIF Values -->
+<!-- vif_values = vif(model) -->
+
+<!-- # Display the VIF Values -->
+<!-- vif_values -->
+
+
+<!-- ``` -->
+
+<!-- ## Fit interaction model -->
+
+<!-- ```{r} -->
+
+
+<!-- model = lm(quality ~ .^2, data = wine_data) -->
+<!-- summary(model) -->
+
+
+<!-- ``` -->
+
+<!-- ## Including Plots -->
+
+
+<!-- ```{r} -->
+
+
+
+<!-- ``` -->
+
+
