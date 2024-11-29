@@ -174,4 +174,33 @@ plot(wine_data$sulphates, wine_data$quality,
 
 ```
 
+## Q-Q Plot
+
+```{r}
+qqnorm(resid(model), main = "Normal Q-Q Plot", col = "darkgrey")
+qqline(resid(model), col = "dodgerblue", lwd = 2)
+```
+
+```{r}
+shapiro.test(resid(model)[1:5000])
+shapiro.test(resid(model)[length(resid(model)) - 5000:length(resid(model))])
+```
+
+Errors are not normally distributed. 5k is the max `shapiro.test` can handel.
+
+## Equal valrience
+
+```{r}
+plot(fitted(model), resid(model), col = "grey", pch = 20,
+     xlab = "Fitted", ylab = "Residuals", main = "Data from Model 1")
+abline(h = 0, col = "darkorange", lwd = 2)
+```
+
+```{r}
+library(lmtest)
+bptest(model)
+```
+
+
+
 
