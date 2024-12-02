@@ -35,15 +35,7 @@ wine_data = bind_rows(red_wine, white_wine)
 # Convert 'type' to a Factor
 wine_data$type = as.factor(wine_data$type)
 
-# Categorize the 'alcohol' Predictor
-wine_data$alcohol_category = cut(
-  wine_data$alcohol,
-  breaks = c(-Inf, 10, 12, Inf), # Define the thresholds for "Low", "Medium", "High"
-  labels = c("Low", "Medium", "High")
-)
-
-# Convert to a Factor
-wine_data$alcohol_category = as.factor(wine_data$alcohol_category)
+nrow(wine_data)
 
 # View(wine_data)
 
@@ -100,6 +92,28 @@ summary(model)
 
 
 ```{r}
+
+# Histogram of Quality with Normal Distribution Overlay
+hist(wine_data$quality,
+     breaks = 10,  # Adjust number of bins
+     probability = TRUE,  # Scale histogram to show probabilities
+     main = "Histogram of Wine Quality with Normal Distribution",
+     xlab = "Wine Quality",
+     col = "lightblue",
+     border = "black")
+
+# Calculate scaling factor for the normal curve
+scale_factor = 0.8 / max(dnorm(x = seq(min(wine_data$quality), max(wine_data$quality), length = 100),
+                               mean = mean(wine_data$quality),
+                               sd = sd(wine_data$quality)))
+
+# Overlay scaled normal distribution curve
+curve(dnorm(x, mean = mean(wine_data$quality), sd = sd(wine_data$quality)) * scale_factor,
+      col = "red",
+      lwd = 2,
+      add = TRUE)
+
+
 
 # Scatter plot: Volatile Acidity vs Quality
 plot(wine_data$volatile.acidity, wine_data$quality,
