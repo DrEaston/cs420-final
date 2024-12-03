@@ -41,12 +41,22 @@ nrow(wine_data)
 
 ```
 
+## Train-Test Data Split
+
+```{r}
+# Modified from Homework Week 11, Exercise 3
+set.seed(420)
+wine_trn_idx  = sample(nrow(wine_data), size = trunc(0.80 * nrow(wine_data)))
+wine_trn_data = wine_data[wine_trn_idx, ]
+wine_tst_data = wine_data[-wine_trn_idx, ]
+```
+
 ## Data types
 
 
 ```{r}
 
-str(wine_data)
+str(wine_trn_data)
 
 ```
 
@@ -56,8 +66,8 @@ str(wine_data)
 
 ```{r}
 
-model = lm(quality ~ ., data = wine_data)
-summary(model)
+full_add_model = lm(quality ~ ., data = wine_trn_data) # Changed the name of this model to be more descriptive
+summary(full_add_model)
 
 ```
 
@@ -69,7 +79,7 @@ if (!require(car)) install.packages("car")
 library(car)
 
 # Compute VIF Values
-vif_values = vif(model)
+vif_values = vif(full_add_model)
 
 # Display the VIF Values
 vif_values
@@ -77,13 +87,17 @@ vif_values
 
 ```
 
+## Additional Collinearity and VIF Analysis
+
+
+
 ## Fit interaction model
 
 ```{r}
 
 
-model = lm(quality ~ .^2, data = wine_data)
-summary(model)
+full_int_model = lm(quality ~ .^2, data = wine_trn_data) # Changed the name of this model to be more descriptive
+summary(full_int_model)
 
 
 ```
@@ -94,7 +108,7 @@ summary(model)
 ```{r}
 
 # Histogram of Quality with Normal Distribution Overlay
-hist(wine_data$quality,
+hist(wine_trn_data$quality,
      breaks = 10,  # Adjust number of bins
      probability = TRUE,  # Scale histogram to show probabilities
      main = "Histogram of Wine Quality with Normal Distribution",
@@ -103,12 +117,12 @@ hist(wine_data$quality,
      border = "black")
 
 # Calculate scaling factor for the normal curve
-scale_factor = 0.8 / max(dnorm(x = seq(min(wine_data$quality), max(wine_data$quality), length = 100),
-                               mean = mean(wine_data$quality),
-                               sd = sd(wine_data$quality)))
+scale_factor = 0.8 / max(dnorm(x = seq(min(wine_trn_data$quality), max(wine_trn_data$quality), length = 100),
+                               mean = mean(wine_trn_data$quality),
+                               sd = sd(wine_trn_data$quality)))
 
 # Overlay scaled normal distribution curve
-curve(dnorm(x, mean = mean(wine_data$quality), sd = sd(wine_data$quality)) * scale_factor,
+curve(dnorm(x, mean = mean(wine_trn_data$quality), sd = sd(wine_trn_data$quality)) * scale_factor,
       col = "red",
       lwd = 2,
       add = TRUE)
@@ -116,14 +130,14 @@ curve(dnorm(x, mean = mean(wine_data$quality), sd = sd(wine_data$quality)) * sca
 
 
 # Scatter plot: Volatile Acidity vs Quality
-plot(wine_data$volatile.acidity, wine_data$quality,
+plot(wine_trn_data$volatile.acidity, wine_trn_data$quality,
      main = "Volatile Acidity vs Wine Quality",
      xlab = "Volatile Acidity",
      ylab = "Wine Quality",
      col = "blue", pch = 19, cex = 0.5)
 
 # Scatter plot: Residual Sugar vs Quality
-plot(wine_data$residual.sugar, wine_data$quality,
+plot(wine_trn_data$residual.sugar, wine_trn_data$quality,
      main = "Residual Sugar vs Wine Quality",
      xlab = "Residual Sugar",
      ylab = "Wine Quality",
@@ -131,56 +145,56 @@ plot(wine_data$residual.sugar, wine_data$quality,
 
 
 # Scatter plot: Fixed Acidity vs Quality
-plot(wine_data$fixed.acidity, wine_data$quality,
+plot(wine_trn_data$fixed.acidity, wine_trn_data$quality,
      main = "Fixed Acidity vs Wine Quality",
      xlab = "Fixed Acidity",
      ylab = "Wine Quality",
      col = "purple", pch = 19, cex = 0.5)
 
 # Scatter plot: Citric Acid vs Quality
-plot(wine_data$citric.acid, wine_data$quality,
+plot(wine_trn_data$citric.acid, wine_trn_data$quality,
      main = "Citric Acid vs Wine Quality",
      xlab = "Citric Acid",
      ylab = "Wine Quality",
      col = "orange", pch = 19, cex = 0.5)
 
 # Scatter plot: Chlorides vs Quality
-plot(wine_data$chlorides, wine_data$quality,
+plot(wine_trn_data$chlorides, wine_trn_data$quality,
      main = "Chlorides vs Wine Quality",
      xlab = "Chlorides",
      ylab = "Wine Quality",
      col = "red", pch = 19, cex = 0.5)
 
 # Scatter plot: Free Sulfur Dioxide vs Quality
-plot(wine_data$free.sulfur.dioxide, wine_data$quality,
+plot(wine_trn_data$free.sulfur.dioxide, wine_trn_data$quality,
      main = "Free Sulfur Dioxide vs Wine Quality",
      xlab = "Free Sulfur Dioxide",
      ylab = "Wine Quality",
      col = "cyan", pch = 19, cex = 0.5)
 
 # Scatter plot: Total Sulfur Dioxide vs Quality
-plot(wine_data$total.sulfur.dioxide, wine_data$quality,
+plot(wine_trn_data$total.sulfur.dioxide, wine_trn_data$quality,
      main = "Total Sulfur Dioxide vs Wine Quality",
      xlab = "Total Sulfur Dioxide",
      ylab = "Wine Quality",
      col = "brown", pch = 19, cex = 0.5)
 
 # Scatter plot: Density vs Quality
-plot(wine_data$density, wine_data$quality,
+plot(wine_trn_data$density, wine_trn_data$quality,
      main = "Density vs Wine Quality",
      xlab = "Density",
      ylab = "Wine Quality",
      col = "pink", pch = 19, cex = 0.5)
 
 # Scatter plot: pH vs Quality
-plot(wine_data$pH, wine_data$quality,
+plot(wine_trn_data$pH, wine_trn_data$quality,
      main = "pH vs Wine Quality",
      xlab = "pH",
      ylab = "Wine Quality",
      col = "darkgreen", pch = 19, cex = 0.5)
 
 # Scatter plot: Sulphates vs Quality
-plot(wine_data$sulphates, wine_data$quality,
+plot(wine_trn_data$sulphates, wine_trn_data$quality,
      main = "Sulphates vs Wine Quality",
      xlab = "Sulphates",
      ylab = "Wine Quality",
