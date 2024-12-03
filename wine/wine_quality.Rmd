@@ -31,13 +31,13 @@ white_wine$type = "White"
 # Combine the Two Datasets
 wine_data = bind_rows(red_wine, white_wine)
 
-
 # Convert 'type' to a Factor
 wine_data$type = as.factor(wine_data$type)
 
 nrow(wine_data)
 
 # View(wine_data)
+
 
 ```
 
@@ -49,6 +49,8 @@ set.seed(420)
 wine_trn_idx  = sample(nrow(wine_data), size = trunc(0.80 * nrow(wine_data)))
 wine_trn_data = wine_data[wine_trn_idx, ]
 wine_tst_data = wine_data[-wine_trn_idx, ]
+wine_trn_data$type = as.factor(wine_trn_data$type)
+wine_tst_data$type = as.factor(wine_tst_data$type)
 ```
 
 ## Data types
@@ -89,6 +91,117 @@ vif_values
 
 ## Additional Collinearity and VIF Analysis
 
+# Modified from Homework Week 11, Exercise 1
+
+Fit a new model with the significant predictors. (Use $\alpha = 0.05$.) Calculate and report the variance inflation factor for each of the predictors. Do any of the VIFs suggest multicollinearity?
+
+**Solution:**
+
+```{r, solution = TRUE}
+library(knitr)
+
+significant_predictors = names(coef(full_add_model))[
+  which(summary(full_add_model)$coefficients[, "Pr(>|t|)"] <= 0.05)
+]
+significant_predictors
+```
+```{r}
+# Select Significant Predictors, Excluding Dummy Variable Artifacts
+significant_predictors = names(coef(full_add_model))[
+  which(summary(full_add_model)$coefficients[, "Pr(>|t|)"] <= 0.05)
+]
+significant_predictors = significant_predictors[significant_predictors != "(Intercept)"]
+
+# Replace Any Dummy Variables with Original Factor Name
+significant_predictors = gsub("type.*", "type", significant_predictors)# Select Significant Predictors, Excluding Dummy Variable Artifacts
+significant_predictors = names(coef(full_add_model))[
+  which(summary(full_add_model)$coefficients[, "Pr(>|t|)"] <= 0.05)
+]
+significant_predictors = significant_predictors[significant_predictors != "(Intercept)"]
+
+# Replace Any Dummy Variables with Original Factor Name
+significant_predictors = gsub("type.*", "type", significant_predictors)
+
+# Remove Duplicates
+significant_predictors = unique(significant_predictors)
+
+# Create the Reduced Formula
+reduced_formula = as.formula(
+  paste("quality ~", paste(significant_predictors, collapse = " + "))
+)
+
+
+# Remove Duplicates
+significant_predictors = unique(significant_predictors)
+
+# Create the Reduced Formula
+reduced_formula = as.formula(
+  paste("quality ~", paste(significant_predictors, collapse = " + "))
+)
+
+reduced_formula
+```
+
+```{r}
+reduced_model = lm(reduced_formula, data = wine_trn_data)
+summary(reduced_model)
+```
+```{r}
+vif_values = vif(reduced_model)
+vif_table = data.frame(
+  Predictor = names(vif_values),
+  VIF = vif_values
+)
+rownames(vif_table) = NULL
+kable(vif_table, col.names = c("Predictor", "Variance Inflation Factor"), 
+      caption = "Variance Inflation Factor for Each Predictor in the Reduced Model")
+```
+
+**Insert comment on whether any VIF is higher than 5.**
+
+Use an $F$-test to compare the full additive model and reduced model. Report the following:
+
+- The null hypothesis
+- The test statistic
+- The distribution of the test statistic under the null hypothesis
+- The p-value
+- A decision
+- Which model you prefer
+
+**Solution:**
+
+```{r, solution = TRUE}
+anova(reduced_model, full_add_model)
+```
+
+Check the assumptions of the model chosen in part **(f)**. Do any assumptions appear to be violated?
+
+**Solution:**
+
+```{r, echo = FALSE}
+plot_fitted_resid = function(model, pointcol = "dodgerblue", linecol = "darkorange") {
+  plot(fitted(model), resid(model), 
+       col = pointcol, pch = 20, cex = 1.5,
+       xlab = "Fitted", ylab = "Residuals")
+  abline(h = 0, col = linecol, lwd = 2)
+}
+
+plot_qq = function(model, pointcol = "dodgerblue", linecol = "darkorange") {
+  qqnorm(resid(model), col = pointcol, pch = 20, cex = 1.5)
+  qqline(resid(model), col = linecol, lwd = 2)
+}
+```
+
+```{r, message = FALSE, warning = FALSE, solution = TRUE}
+library(lmtest)
+bptest(reduced_model)
+shapiro.test(resid(reduced_model))
+par(mfrow = c(1, 2))
+plot_fitted_resid(reduced_model)
+plot_qq(reduced_model)
+```
+
+There do not appear to be any violations of assumptions.
 
 
 ## Fit interaction model
