@@ -73,6 +73,13 @@ summary(full_add_model)
 
 ```
 
+## Pairs Plots
+
+```{r}
+library(faraway)
+pairs(wine_trn_data, col = "dodgerblue")
+```
+
 ## VIF Values
 
 
@@ -174,7 +181,9 @@ Use an $F$-test to compare the full additive model and reduced model. Report the
 anova(reduced_model, full_add_model)
 ```
 
-Check the assumptions of the model chosen in part **(f)**. Do any assumptions appear to be violated?
+
+
+Check the assumptions of the model. Do any assumptions appear to be violated?
 
 **Solution:**
 
@@ -195,13 +204,11 @@ plot_qq = function(model, pointcol = "dodgerblue", linecol = "darkorange") {
 ```{r, message = FALSE, warning = FALSE, solution = TRUE}
 library(lmtest)
 bptest(reduced_model)
-shapiro.test(resid(reduced_model))
 par(mfrow = c(1, 2))
 plot_fitted_resid(reduced_model)
 plot_qq(reduced_model)
 ```
 
-There do not appear to be any violations of assumptions.
 
 
 ## Fit interaction model
