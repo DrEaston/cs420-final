@@ -35,11 +35,20 @@ wine_data = bind_rows(red_wine, white_wine)
 # Convert 'type' to a Factor
 wine_data$type = as.factor(wine_data$type)
 
-nrow(wine_data)
+# Categorize the 'alcohol' Predictor
+#wine_data$alcohol_category = cut(
+#  wine_data$alcohol,
+#  breaks = c(-Inf, 10, 12, Inf), # Define the thresholds for "Low", "Medium", "High"
+#  labels = c("Low", "Medium", "High")
+#)
+
+# Convert to a Factor
+#wine_data$alcohol_category = as.factor(wine_data$alcohol_category)
 
 # View(wine_data)
 
 ```
+
 
 ## Data types
 
@@ -50,6 +59,15 @@ str(wine_data)
 
 ```
 
+```{r}
+res_sugar_6580 = which(wine_data$residual.sugar == 65.80)
+free_sulf_dio_289 = which(wine_data$free.sulfur.dioxide == 289.0)
+dens_10103 = which(wine_data$density == 1.0103)
+
+remove_idx = c(res_sugar_6580, free_sulf_dio_289, dens_10103)
+wine_data = wine_data[-remove_idx, ]
+nrow(wine_data)
+```
 
 
 ## Fit additive Model
@@ -77,6 +95,20 @@ vif_values
 
 ```
 
+## Visualize correlations through a heatmap
+```{r}
+if (!require(corrplot)) install.packages("corrplot")
+library(corrplot)
+numeric_data = wine_data %>%
+  select(-type, -quality) # Considers numeric predictors only
+cor_matrix = cor(numeric_data, use = "complete.obs")
+
+
+corrplot(cor_matrix, method = "color", addCoef.col = "black", 
+         tl.cex = 0.8, number.cex = 0.7, main = "Correlation Heatmap")
+```
+
+
 ## Fit interaction model
 
 ```{r}
@@ -92,28 +124,6 @@ summary(model)
 
 
 ```{r}
-
-# Histogram of Quality with Normal Distribution Overlay
-hist(wine_data$quality,
-     breaks = 10,  # Adjust number of bins
-     probability = TRUE,  # Scale histogram to show probabilities
-     main = "Histogram of Wine Quality with Normal Distribution",
-     xlab = "Wine Quality",
-     col = "lightblue",
-     border = "black")
-
-# Calculate scaling factor for the normal curve
-scale_factor = 0.8 / max(dnorm(x = seq(min(wine_data$quality), max(wine_data$quality), length = 100),
-                               mean = mean(wine_data$quality),
-                               sd = sd(wine_data$quality)))
-
-# Overlay scaled normal distribution curve
-curve(dnorm(x, mean = mean(wine_data$quality), sd = sd(wine_data$quality)) * scale_factor,
-      col = "red",
-      lwd = 2,
-      add = TRUE)
-
-
 
 # Scatter plot: Volatile Acidity vs Quality
 plot(wine_data$volatile.acidity, wine_data$quality,
@@ -189,3 +199,59 @@ plot(wine_data$sulphates, wine_data$quality,
 ```
 
 
+## Logs
+
+```{r}
+##model = lm(quality ~ .^2, data = wine_data)
+##summary(model)
+
+
+# Select only numeric columns
+numeric_columns <- wine_data[sapply(wine_data, is.numeric)]
+
+# Create histograms for each numeric column
+par(mfrow = c(2, 2))  # Layout for multiple plots
+sapply(names(numeric_columns), function(column) {
+  hist(numeric_columns[[column]], main = paste("Histogram of", column),
+       xlab = column, col = "lightblue", border = "white")
+})
+
+```
+
+
+## Logs
+
+```{r}
+names(wine_data)
+```
+
+
+```{r}
+model_add = lm(quality ~ ., data = wine_data)
+model_log = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid + residual.sugar + chlorides + log(free.sulfur.dioxide) + total.sulfur.dioxide + density + (pH) + (sulphates) + (alcohol) + type, data = wine_data)
+
+model_log_int = lm(quality ~ (fixed.acidity + log(volatile.acidity) + citric.acid + residual.sugar + chlorides + log(free.sulfur.dioxide) + total.sulfur.dioxide + density + (pH) + (sulphates) + (alcohol) + type)^2, data = wine_data)
+
+summary(model_add)$adj.r.squared
+summary(model_log)$adj.r.squared
+summary(model)$adj.r.squared
+summary(model_log_int)$adj.r.squared
+```
+
+
+```{r}
+model_bac_aic = step(model_log_int, trace = 0)
+model_bac_bic = step(model_log_int, k = log(nrow(wine_data)), trace = 0)
+model_both_aic = step(model_log_int, direction = "both", trace = 0)
+summary(model_bac_aic)$adj.r.squared
+summary(model_bac_bic)$adj.r.squared
+summary(model_both_aic)$adj.r.squared
+```
+```{r}
+#model_bac_aic = step(model_add, trace = 0)
+#model_bac_bic = step(model_add, k = log(nrow(wine_data)), trace = 0)
+#model_both_aic = step(model_add, direction = "both", trace = 0)
+#summary(model_bac_aic)$adj.r.squared
+#summary(model_bac_bic)$adj.r.squared
+#summary(model_both_aic)$adj.r.squared
+```
