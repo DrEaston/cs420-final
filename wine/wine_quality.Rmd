@@ -48,14 +48,12 @@ table(wine_data$quality) # Distribution of `quality`
 ```
 
 
-## Visualizations
+## Histogram of quality
 
 ```{r}
-
 if (!require(ggplot2)) install.packages("ggplot2")
 library(ggplot2)
 
-# Histogram of quality
 ggplot(wine_data, aes(x = quality, fill = type)) +
   geom_bar(position = "dodge") +
   labs(title = "Distribution of Quality by Type", x = "Quality", y = "Count") +
@@ -70,15 +68,15 @@ White wines dominate `quality` score 6.
 
 Red wines are nearly evenly split between `quality` scores 5 and 6.
 
+## Visualize correlations through a heatmap
 ```{r}
-# Correlation matrix
 if (!require(corrplot)) install.packages("corrplot")
 library(corrplot)
 numeric_data = wine_data %>%
   select(-type, -quality) # Considers numeric predictors only
 cor_matrix = cor(numeric_data, use = "complete.obs")
 
-# Visualize correlations
+
 corrplot(cor_matrix, method = "color", addCoef.col = "black", 
          tl.cex = 0.8, number.cex = 0.7, main = "Correlation Heatmap")
 ```
@@ -87,9 +85,8 @@ Comments:
 
 TODO: Insert comments about heatmap.
 
-
+## Histograms for numeric predictors
 ```{r}
-# Histograms for numeric predictors
 numeric_columns = names(numeric_data)
 for (col in numeric_columns) {
   print(
@@ -122,10 +119,9 @@ Comments:
 The median values of `quality` are slightly different between red and white wines, with red wines having a smaller range of quality scores compared to white wines.
 
 
-## Transforming Highly Skewed Variables
+## Transforming Skewed Variables
 
 ```{r}
-# Log-transform skewed variables
 wine_data = wine_data %>%
   mutate(
     log_residual_sugar = log1p(residual.sugar),  # Use log1p to handle 0 values
@@ -136,7 +132,6 @@ wine_data = wine_data %>%
 
 ## Visualizing Transformed Variables
 ```{r}
-# Log-transformed residual sugar
 ggplot(wine_data, aes(x = log_residual_sugar)) +
   geom_histogram(fill = "skyblue", color = "black", bins = 30) +
   labs(title = "Histogram of Log-Transformed Residual Sugar", 
@@ -146,7 +141,6 @@ ggplot(wine_data, aes(x = log_residual_sugar)) +
 ```
 
 ```{r}
-# Log-transformed chlorides
 ggplot(wine_data, aes(x = log_chlorides)) +
   geom_histogram(fill = "skyblue", color = "black", bins = 30) +
   labs(title = "Histogram of Log-Transformed Chlorides", 
@@ -156,7 +150,6 @@ ggplot(wine_data, aes(x = log_chlorides)) +
 ```
 
 ```{r}
-# Log-transformed sulphates
 ggplot(wine_data, aes(x = log_sulphates)) +
   geom_histogram(fill = "skyblue", color = "black", bins = 30) +
   labs(title = "Histogram of Log-Transformed Sulphates", 
@@ -216,3 +209,110 @@ For the two models, the differences between the Residual Standard Errors, the Ad
 
 Both AIC and BIC slightly favor the original model over the transformed model.
 
+## Residual Diagnostics for lm_full_original
+
+```{r}
+plot(lm_full_original, which = 1, main = "Residuals vs Fitted")
+```
+```{r}
+plot(lm_full_original, which = 2, main = "Normal Q-Q Plot")
+```
+
+Comments:
+
+We'll attempt to address some of the potential linear model assumption violations by experimenting with interactive and polynomial terms.
+
+We'll try `alcohol` and `density` as second-order polynomials. Both appear to be significant predictors, and using polynomials will amplify their influence on `quality`.
+
+It also makes sense to explore interactive relationships involving `type`. Type is the sole categorical predictor. We'll see how it interacts with the two influential numerical predictors, `alcohol` and `density`.
+
+## Add Interaction Terms and Polynomial Terms
+```{r}
+# Interactions: Include interactions involving 'type' and 'alcohol' or 'density'
+# Polynomial: Include quadratic terms for 'alcohol' and 'density' to capture non-linear effects
+lm_with_interactions = lm(
+  quality ~ fixed.acidity + volatile.acidity + citric.acid +
+    residual.sugar + chlorides + free.sulfur.dioxide +
+    total.sulfur.dioxide + density + I(density^2) +
+    pH + sulphates + alcohol + I(alcohol^2) +
+    type + type:alcohol + type:density,
+  data = wine_data
+)
+
+summary(lm_with_interactions)
+```
+
+## Address Heteroscedasticity with Log Transformation of the Response
+```{r}
+wine_data$log_quality = log(wine_data$quality)
+lm_with_log_response = lm(
+  log_quality ~ fixed.acidity + volatile.acidity + citric.acid +
+    residual.sugar + chlorides + free.sulfur.dioxide +
+    total.sulfur.dioxide + density + I(density^2) +
+    pH + sulphates + alcohol + I(alcohol^2) +
+    type + type:alcohol + type:density,
+  data = wine_data
+)
+
+summary(lm_with_log_response)
+```
+
+Comments:
+
+Compared to the full additive model, this revised model improves slightly upon Residual Standard Error and Adjusted R-squared.
+
+Looking specifically at the polynomial terms, the small Pr(>|t|) values for `I(density^2)` and `I(alcohol^2)` suggest that they benefit the model.
+
+The Pr(>|t|) for `density:typeWhite` suggests that `density` impacts `quality` differently, depending on the `type` of wine. The Pr(>|t|) for `alcohol:typeWhite` is much higher, however, suggesting we might want to remove this interactive term from our model.
+
+As was the case in our previous models, `citric.acid` doesn't look like a significant predictor, and we should probably remove it.
+
+## Diagnostic Plots for the Model with Log-Transformed Response
+```{r}
+plot(lm_with_log_response, which = 1, main = "Residuals vs Fitted")
+```
+
+```{r}
+plot(lm_with_log_response, which = 2, main = "Normal Q-Q Plot")
+```
+
+Comments:
+
+The Normal Q-Q Plot looks especially bad on the left end. Using a log transformation on the response variable doesn't look like a promising path. We'll continue to iterate on the predictors and hope to find a model that better abides by linear model assumptions.
+
+## Refine the model by removing `citric.acid` and `alcohol:typeWhite`
+```{r}
+lm_refined = lm(
+  quality ~ fixed.acidity + volatile.acidity +
+    residual.sugar + chlorides + free.sulfur.dioxide +
+    total.sulfur.dioxide + density + I(density^2) +
+    pH + sulphates + alcohol + I(alcohol^2) +
+    type + type:density,
+  data = wine_data
+)
+
+summary(lm_refined)
+```
+
+Comments:
+
+Removing `citric.acid` and `alcohol:typeWhite` did not harm the model's performance.
+
+Other variables remain significant.
+
+## Check multicollinearity with VIF
+```{r}
+if (!require(car)) install.packages("car")
+library(car)
+vif_values = vif(lm_refined)
+vif_values
+
+high_vif = vif_values[vif_values > 5]
+high_vif
+```
+
+Comments:
+
+As expected variables with polynomial terms (`density` and `alcohol`) are inherently collinear with their base terms.
+
+The interactive term, `density:typeWhite` is collinear with its component terms.
