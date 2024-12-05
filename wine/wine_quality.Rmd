@@ -41,6 +41,86 @@ nrow(wine_data)
 
 ```
 
+## Additional Preliminary Overview of the Dataset
+
+```{r}
+table(wine_data$quality) # Distribution of `quality`
+```
+
+
+## Visualizations
+
+```{r}
+
+if (!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+
+# Histogram of quality
+ggplot(wine_data, aes(x = quality, fill = type)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Distribution of Quality by Type", x = "Quality", y = "Count") +
+  theme_minimal()
+```
+
+Comments:
+
+`quality` values are concentrated around 5, 6, and 7.
+
+White wines dominate `quality` score 6.
+
+Red wines are nearly evenly split between `quality` scores 5 and 6.
+
+```{r}
+# Correlation matrix
+if (!require(corrplot)) install.packages("corrplot")
+library(corrplot)
+numeric_data = wine_data %>%
+  select(-type, -quality) # Considers numeric predictors only
+cor_matrix = cor(numeric_data, use = "complete.obs")
+
+# Visualize correlations
+corrplot(cor_matrix, method = "color", addCoef.col = "black", 
+         tl.cex = 0.8, number.cex = 0.7, main = "Correlation Heatmap")
+```
+
+Comments:
+
+There's a strong positive correlation between `alcohol` and `quality`.
+
+`density` has a moderate negative correlation with `alcohol` and `quality`.
+
+There's a high correlation between `free.sulfur.dioxide` and `total.sulfur.dioxide`.
+
+
+```{r}
+# Histograms for numeric predictors
+numeric_columns = names(numeric_data)
+for (col in numeric_columns) {
+  print(
+    ggplot(wine_data, aes_string(x = col)) +
+      geom_histogram(fill = "skyblue", color = "black", bins = 30) +
+      labs(title = paste("Histogram of", col), x = col, y = "Frequency") +
+      theme_minimal()
+  )
+}
+```
+
+Comments:
+
+Some variables, like `fixed.acidity` and `citric.acid`, show near-normal distributions, which is desirable.
+
+Many numeric variables are skewed (including `volatile.acidity`, `residual.sugar`, `chlorides`). We'll consider transformations like log or square root.
+
+## Exploring the Relationship Between Type and Quality
+
+# Boxplot of quality by type
+```{r}
+ggplot(wine_data, aes(x = type, y = quality, fill = type)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Quality by Type", x = "Type", y = "Quality") +
+  theme_minimal()
+```
+
 ## Train-Test Data Split
 
 ```{r}
@@ -73,15 +153,7 @@ summary(full_add_model)
 
 ```
 
-## Pairs Plots
-
-```{r}
-library(faraway)
-pairs(wine_trn_data, col = "dodgerblue")
-```
-
 ## VIF Values
-
 
 ```{r}
 if (!require(car)) install.packages("car")
