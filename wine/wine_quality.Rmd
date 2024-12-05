@@ -91,15 +91,19 @@ nrow(wine_data)
 
 
 
-# ```{r}
-# set.seed(1234)
-# subset_idx = sample(nrow(wine_data), 200)
-# wine_data_subset = wine_data[subset_idx, ]
-# 
-# wine_data_subset$quality = jitter(wine_data_subset$quality, factor = 2.0)
-# 
-# pairs(wine_dat)
-# ```
+<!-- ```{r} -->
+<!-- set.seed(1234) -->
+<!-- subset_idx = sample(nrow(wine_data), 70) -->
+<!-- wine_data_subset = wine_data[subset_idx, ] -->
+
+<!-- wine_data_subset$quality = jitter(wine_data_subset$quality, factor = 2.0) -->
+
+<!-- pairs(wine_data_subset, col = "dodgerblue") -->
+<!-- ``` -->
+
+
+
+
 
 ```{r}
 get_loocv_rmse = function(model) {
@@ -198,11 +202,51 @@ min_max_scale = function(col) {
 ```
 
 ```{r}
+# wine_data$quality = wine_data$quality + rnorm(nrow(wine_data), mean = 0, sd = 1.0)
+
+
 for(i in 1:ncol(wine_data)){
-  if(i == 13) next
+  if(i == 13 | i == 12) next
   wine_data[, i] = min_max_scale(wine_data[, i])
 }
+
+# wine_data[, 12] = min_max_scale(wine_data[, 12])
+
+# wine_data[, 12] = (wine_data[, 12] - 0) / (10 - 0)
 ```
+
+
+
+<!-- ```{r} -->
+<!-- subset_idx = sample(nrow(wine_data), 500) -->
+<!-- wine_data_subset = wine_data[subset_idx, ] -->
+<!-- # wine_data_subset$quality = jitter(wine_data_subset$quality, factor = 1.0) -->
+<!-- # plot(quality ~ ., data = wine_data_subset) -->
+<!-- # pairs(wine_data_subset) -->
+<!-- # plot(quality ~ ., data = wine_data_subset) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- wine_data$quality = wine_data$quality + 0.5 -->
+<!-- wine_data$quality = log(wine_data$quality) -->
+
+<!-- set.seed(1234) -->
+<!-- subset_idx = sample(nrow(wine_data), 70) -->
+<!-- wine_data_subset = wine_data[subset_idx, ] -->
+
+<!-- wine_data_subset$quality = jitter(wine_data_subset$quality, factor = 1.0) -->
+
+<!-- pairs(wine_data_subset, col = "dodgerblue") -->
+<!-- ``` -->
+
+
+```{r}
+# wine_data$quality = log(wine_data$quality / (1 - wine_data$quality))
+```
+
+
 
 
 
@@ -212,9 +256,17 @@ wine_data_train = wine_data[train_idx, ]
 wine_data_test = wine_data[-train_idx, ]
 ```
 
+
 ```{r}
-wine_data_train$quality = wine_data_train$quality + 1
-add_model = lm(log(quality) ~ . + type:., data = wine_data_train)
+library(faraway)
+library(MASS)
+library(lmtest)
+```
+
+
+```{r}
+# + type:.
+add_model = lm(quality ~ . + type:. - pH - type:pH, data = wine_data_train)
 n = length(resid(add_model))
 
 back_bic = step(
@@ -226,29 +278,73 @@ back_bic = step(
 
 get_loocv_rmse(back_bic)
 get_adj_r2(back_bic)
+vif(back_bic)
 
 summary(back_bic)
+
+
+
+
+boxcox(back_bic, plotit = TRUE, lambda = seq(0.5, 1.2, 0.05))
 ```
 
 ```{r}
-int_model = lm(quality ~ fixed.acidity + volatile.acidity + residual.sugar
-               + chlorides + free.sulfur.dioxide + total.sulfur.dioxide
-               + density + pH + sulphates
-               + alcohol + type + volatile.acidity:type
-               + residual.sugar:type + total.sulfur.dioxide:type
-               + density:type + pH:type, data = wine_data)
+int_model = lm(quality ~ volatile.acidity
+               + chlorides + free.sulfur.dioxide
+               + density + sulphates
+               + alcohol + volatile.acidity:type,
+               data = wine_data)
 
 get_loocv_rmse(int_model)
 get_adj_r2(int_model)
+vif(int_model)
 
 summary(int_model)
+
+
+
+plot(fitted(int_model), resid(int_model))
+abline(h = 0)
+
+bptest(int_model)
+
+qqnorm(resid(int_model))
+qqline(resid(int_model), col = "dodgerblue")
+
+
+
+boxcox(int_model, plotit = TRUE, lambda = seq(0.5, 1.2, 0.05))
 ```
 
 
+```{r}
+int_model_boxcox = lm((((quality ^ 0.7) - 1) / 0.7) ~ volatile.acidity
+               + chlorides + free.sulfur.dioxide
+               + sulphates
+               + alcohol + volatile.acidity:type,
+               data = wine_data_train)
+
+get_loocv_rmse(int_model_boxcox)
+get_adj_r2(int_model_boxcox)
+vif(int_model_boxcox)
+
+summary(int_model_boxcox)
+```
 
 
+```{r}
+plot(fitted(int_model_boxcox), resid(int_model_boxcox))
+abline(h = 0)
+```
 
+```{r}
+bptest(int_model_boxcox)
+```
 
+```{r}
+qqnorm(resid(int_model_boxcox))
+qqline(resid(int_model_boxcox), col = "dodgerblue")
+```
 
 
 
