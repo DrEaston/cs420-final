@@ -160,7 +160,7 @@ ggplot(wine_data, aes(x = log_sulphates)) +
 
 Comments:
 
-We performed log transformations on the skewed variables, but the histograms of the transformations don't suggest the tranformation really improved the situation. Below, we'll compare two full models - one with original predictors and the other with log transformed predictors. Based on the histograms, our hunch is that the transformed predictors won't improve the model.
+We performed log transformations on the skewed variables, but the histograms of the transformations don't suggest the transformations really improved the situation. Below, we'll compare two full models - one with original predictors and the other with log transformed predictors. Based on the histograms, our hunch is that the transformed predictors won't improve the model.
 
 ## Placeholder: Data Partitioning (for Predictive Models)
 ## Train-Test Data Split
