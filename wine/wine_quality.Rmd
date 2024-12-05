@@ -213,7 +213,8 @@ wine_data_test = wine_data[-train_idx, ]
 ```
 
 ```{r}
-add_model = lm(quality ~ . + type:., data = wine_data_train)
+wine_data_train$quality = wine_data_train$quality + 1
+add_model = lm(log(quality) ~ . + type:., data = wine_data_train)
 n = length(resid(add_model))
 
 back_bic = step(
