@@ -387,22 +387,14 @@ wine_data = bind_rows(red_wine, white_wine)
 # Convert &#39;type&#39; to a Factor
 wine_data$type = as.factor(wine_data$type)
 
-# Categorize the &#39;alcohol&#39; Predictor
-wine_data$alcohol_category = cut(
-  wine_data$alcohol,
-  breaks = c(-Inf, 10, 12, Inf), # Define the thresholds for &quot;Low&quot;, &quot;Medium&quot;, &quot;High&quot;
-  labels = c(&quot;Low&quot;, &quot;Medium&quot;, &quot;High&quot;)
-)
-
-# Convert to a Factor
-wine_data$alcohol_category = as.factor(wine_data$alcohol_category)
-
-# View(wine_data)</code></pre>
+nrow(wine_data)</code></pre>
+<pre><code>## [1] 6497</code></pre>
+<pre class="r"><code># View(wine_data)</code></pre>
 </div>
 <div id="data-types" class="section level2">
 <h2>Data types</h2>
 <pre class="r"><code>str(wine_data)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    6497 obs. of  14 variables:
+<pre><code>## &#39;data.frame&#39;:    6497 obs. of  13 variables:
 ##  $ fixed.acidity       : num  7.4 7.8 7.8 11.2 7.4 7.4 7.9 7.3 7.8 7.5 ...
 ##  $ volatile.acidity    : num  0.7 0.88 0.76 0.28 0.7 0.66 0.6 0.65 0.58 0.5 ...
 ##  $ citric.acid         : num  0 0 0.04 0.56 0 0 0.06 0 0.02 0.36 ...
@@ -415,8 +407,7 @@ wine_data$alcohol_category = as.factor(wine_data$alcohol_category)
 ##  $ sulphates           : num  0.56 0.68 0.65 0.58 0.56 0.56 0.46 0.47 0.57 0.8 ...
 ##  $ alcohol             : num  9.4 9.8 9.8 9.8 9.4 9.4 9.4 10 9.5 10.5 ...
 ##  $ quality             : int  5 5 5 6 5 5 5 7 7 5 ...
-##  $ type                : Factor w/ 2 levels &quot;Red&quot;,&quot;White&quot;: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ alcohol_category    : Factor w/ 3 levels &quot;Low&quot;,&quot;Medium&quot;,..: 1 1 1 1 1 1 1 1 1 2 ...</code></pre>
+##  $ type                : Factor w/ 2 levels &quot;Red&quot;,&quot;White&quot;: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
 </div>
 <div id="fit-additive-model" class="section level2">
 <h2>Fit additive Model</h2>
@@ -428,31 +419,29 @@ summary(model)</code></pre>
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -3.7718 -0.4792 -0.0265  0.4420  3.0269 
+## -3.7796 -0.4671 -0.0444  0.4561  3.0211 
 ## 
 ## Coefficients:
-##                          Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)             1.035e+02  1.415e+01   7.317 2.84e-13 ***
-## fixed.acidity           8.717e-02  1.576e-02   5.533 3.28e-08 ***
-## volatile.acidity       -1.520e+00  8.182e-02 -18.579  &lt; 2e-16 ***
-## citric.acid            -7.750e-02  7.972e-02  -0.972  0.33102    
-## residual.sugar          6.068e-02  5.952e-03  10.195  &lt; 2e-16 ***
-## chlorides              -8.117e-01  3.346e-01  -2.426  0.01530 *  
-## free.sulfur.dioxide     5.005e-03  7.658e-04   6.535 6.83e-11 ***
-## total.sulfur.dioxide   -1.475e-03  3.248e-04  -4.541 5.71e-06 ***
-## density                -1.023e+02  1.434e+01  -7.130 1.11e-12 ***
-## pH                      5.093e-01  9.056e-02   5.624 1.94e-08 ***
-## sulphates               7.302e-01  7.619e-02   9.584  &lt; 2e-16 ***
-## alcohol                 1.782e-01  2.593e-02   6.872 6.93e-12 ***
-## typeWhite              -3.541e-01  5.687e-02  -6.226 5.07e-10 ***
-## alcohol_categoryMedium  2.858e-02  3.619e-02   0.790  0.42982    
-## alcohol_categoryHigh    1.994e-01  7.033e-02   2.836  0.00459 ** 
+##                        Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)           1.048e+02  1.414e+01   7.411 1.42e-13 ***
+## fixed.acidity         8.507e-02  1.576e-02   5.396 7.05e-08 ***
+## volatile.acidity     -1.492e+00  8.135e-02 -18.345  &lt; 2e-16 ***
+## citric.acid          -6.262e-02  7.972e-02  -0.786   0.4322    
+## residual.sugar        6.244e-02  5.934e-03  10.522  &lt; 2e-16 ***
+## chlorides            -7.573e-01  3.344e-01  -2.264   0.0236 *  
+## free.sulfur.dioxide   4.937e-03  7.662e-04   6.443 1.25e-10 ***
+## total.sulfur.dioxide -1.403e-03  3.237e-04  -4.333 1.49e-05 ***
+## density              -1.039e+02  1.434e+01  -7.248 4.71e-13 ***
+## pH                    4.988e-01  9.058e-02   5.506 3.81e-08 ***
+## sulphates             7.217e-01  7.624e-02   9.466  &lt; 2e-16 ***
+## alcohol               2.227e-01  1.807e-02  12.320  &lt; 2e-16 ***
+## typeWhite            -3.613e-01  5.675e-02  -6.367 2.06e-10 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.7323 on 6482 degrees of freedom
-## Multiple R-squared:  0.2983, Adjusted R-squared:  0.2968 
-## F-statistic: 196.8 on 14 and 6482 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.7331 on 6484 degrees of freedom
+## Multiple R-squared:  0.2965, Adjusted R-squared:  0.2952 
+## F-statistic: 227.8 on 12 and 6484 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="vif-values" class="section level2">
 <h2>VIF Values</h2>
@@ -473,20 +462,14 @@ vif_values = vif(model)
 
 # Display the VIF Values
 vif_values</code></pre>
-<pre><code>##                           GVIF Df GVIF^(1/(2*Df))
-## fixed.acidity         5.053982  1        2.248106
-## volatile.acidity      2.198011  1        1.482569
-## citric.acid           1.625742  1        1.275046
-## residual.sugar        9.713110  1        3.116586
-## chlorides             1.664366  1        1.290103
-## free.sulfur.dioxide   2.237963  1        1.495982
-## total.sulfur.dioxide  4.082610  1        2.020547
-## density              22.409789  1        4.733898
-## pH                    2.568366  1        1.602612
-## sulphates             1.557023  1        1.247807
-## alcohol              11.585974  1        3.403818
-## type                  7.270195  1        2.696330
-## alcohol_category      7.219999  2        1.639209</code></pre>
+<pre><code>##        fixed.acidity     volatile.acidity          citric.acid 
+##             5.048348             2.168159             1.622151 
+##       residual.sugar            chlorides  free.sulfur.dioxide 
+##             9.634653             1.659342             2.235693 
+## total.sulfur.dioxide              density                   pH 
+##             4.045899            22.337223             2.563776 
+##            sulphates              alcohol                 type 
+##             1.555807             5.616857             7.224467</code></pre>
 </div>
 <div id="fit-interaction-model" class="section level2">
 <h2>Fit interaction model</h2>
@@ -498,230 +481,198 @@ summary(model)</code></pre>
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -3.4258 -0.4633 -0.0266  0.4469  3.0191 
+## -3.2349 -0.4646 -0.0221  0.4411  3.0186 
 ## 
 ## Coefficients:
-##                                               Estimate Std. Error t value
-## (Intercept)                                 -1.429e+02  3.446e+02  -0.415
-## fixed.acidity                                6.356e+00  7.176e+00   0.886
-## volatile.acidity                            -3.030e+02  1.032e+02  -2.936
-## citric.acid                                 -2.776e+02  1.149e+02  -2.415
-## residual.sugar                              -2.268e-01  7.831e-01  -0.290
-## chlorides                                   -6.171e+02  5.267e+02  -1.172
-## free.sulfur.dioxide                         -1.584e+00  1.365e+00  -1.161
-## total.sulfur.dioxide                         2.202e-01  5.030e-01   0.438
-## density                                      1.449e+02  3.469e+02   0.418
-## pH                                           1.111e+02  7.511e+01   1.479
-## sulphates                                   -4.535e+00  1.164e+02  -0.039
-## alcohol                                     -5.761e-01  2.297e+01  -0.025
-## typeWhite                                    9.357e+01  5.970e+01   1.567
-## alcohol_categoryMedium                       9.373e+01  4.891e+01   1.916
-## alcohol_categoryHigh                         1.429e+02  9.070e+01   1.575
-## fixed.acidity:volatile.acidity              -2.988e-01  1.291e-01  -2.315
-## fixed.acidity:citric.acid                   -2.655e-01  1.219e-01  -2.179
-## fixed.acidity:residual.sugar                 6.600e-03  4.057e-03   1.627
-## fixed.acidity:chlorides                     -1.760e+00  5.611e-01  -3.137
-## fixed.acidity:free.sulfur.dioxide            9.063e-04  1.429e-03   0.634
-## fixed.acidity:total.sulfur.dioxide          -7.810e-05  5.709e-04  -0.137
-## fixed.acidity:density                       -6.033e+00  7.116e+00  -0.848
-## fixed.acidity:pH                             2.289e-01  6.679e-02   3.427
-## fixed.acidity:sulphates                      1.363e-01  1.198e-01   1.138
-## fixed.acidity:alcohol                       -8.860e-02  2.871e-02  -3.086
-## fixed.acidity:typeWhite                     -3.249e-02  7.750e-02  -0.419
-## fixed.acidity:alcohol_categoryMedium         1.768e-01  5.463e-02   3.236
-## fixed.acidity:alcohol_categoryHigh           3.341e-01  1.102e-01   3.031
-## volatile.acidity:citric.acid                 9.897e-01  5.707e-01   1.734
-## volatile.acidity:residual.sugar             -1.475e-01  4.663e-02  -3.163
-## volatile.acidity:chlorides                   2.245e+00  2.555e+00   0.879
-## volatile.acidity:free.sulfur.dioxide         1.269e-02  7.514e-03   1.688
-## volatile.acidity:total.sulfur.dioxide        2.932e-03  2.760e-03   1.062
-## volatile.acidity:density                     2.971e+02  1.048e+02   2.835
-## volatile.acidity:pH                         -2.265e-01  8.086e-01  -0.280
-## volatile.acidity:sulphates                  -3.396e-01  6.608e-01  -0.514
-## volatile.acidity:alcohol                     8.933e-01  2.097e-01   4.260
-## volatile.acidity:typeWhite                  -5.908e-01  3.934e-01  -1.502
-## volatile.acidity:alcohol_categoryMedium     -5.241e-01  3.121e-01  -1.680
-## volatile.acidity:alcohol_categoryHigh       -2.241e-01  6.242e-01  -0.359
-## citric.acid:residual.sugar                  -1.301e-01  4.524e-02  -2.875
-## citric.acid:chlorides                        2.571e+00  2.298e+00   1.118
-## citric.acid:free.sulfur.dioxide              9.333e-03  6.426e-03   1.452
-## citric.acid:total.sulfur.dioxide            -3.115e-03  2.479e-03  -1.257
-## citric.acid:density                          2.725e+02  1.161e+02   2.346
-## citric.acid:pH                              -7.378e-01  7.467e-01  -0.988
-## citric.acid:sulphates                       -9.821e-01  7.043e-01  -1.394
-## citric.acid:alcohol                          1.086e+00  2.164e-01   5.016
-## citric.acid:typeWhite                        1.196e+00  4.544e-01   2.632
-## citric.acid:alcohol_categoryMedium          -8.836e-01  3.268e-01  -2.703
-## citric.acid:alcohol_categoryHigh            -2.398e+00  6.084e-01  -3.941
-## residual.sugar:chlorides                    -4.661e-01  2.423e-01  -1.924
-## residual.sugar:free.sulfur.dioxide          -1.065e-03  5.423e-04  -1.963
-## residual.sugar:total.sulfur.dioxide          1.479e-04  2.075e-04   0.713
-## residual.sugar:density                       3.814e-01  7.558e-01   0.505
-## residual.sugar:pH                           -2.636e-02  3.077e-02  -0.857
-## residual.sugar:sulphates                    -1.886e-02  4.855e-02  -0.389
-## residual.sugar:alcohol                       6.303e-03  1.061e-02   0.594
-## residual.sugar:typeWhite                     1.521e-02  2.882e-02   0.528
-## residual.sugar:alcohol_categoryMedium        2.148e-02  2.094e-02   1.026
-## residual.sugar:alcohol_categoryHigh          3.069e-02  4.034e-02   0.761
-## chlorides:free.sulfur.dioxide                2.001e-02  2.841e-02   0.704
-## chlorides:total.sulfur.dioxide              -3.970e-03  1.538e-02  -0.258
-## chlorides:density                            6.895e+02  5.322e+02   1.296
-## chlorides:pH                                -1.160e+01  4.010e+00  -2.893
-## chlorides:sulphates                         -7.102e+00  1.983e+00  -3.581
-## chlorides:alcohol                           -1.624e+00  1.169e+00  -1.389
-## chlorides:typeWhite                         -2.573e+00  2.582e+00  -0.996
-## chlorides:alcohol_categoryMedium             4.175e+00  1.688e+00   2.473
-## chlorides:alcohol_categoryHigh               5.735e+00  3.832e+00   1.497
-## free.sulfur.dioxide:total.sulfur.dioxide    -9.909e-05  8.946e-06 -11.076
-## free.sulfur.dioxide:density                  1.556e+00  1.381e+00   1.127
-## free.sulfur.dioxide:pH                       3.901e-03  7.627e-03   0.511
-## free.sulfur.dioxide:sulphates                1.996e-02  6.417e-03   3.110
-## free.sulfur.dioxide:alcohol                 -4.892e-05  2.422e-03  -0.020
-## free.sulfur.dioxide:typeWhite                2.470e-02  4.894e-03   5.047
-## free.sulfur.dioxide:alcohol_categoryMedium   7.919e-03  2.972e-03   2.664
-## free.sulfur.dioxide:alcohol_categoryHigh     1.373e-02  5.925e-03   2.318
-## total.sulfur.dioxide:density                -2.035e-01  5.109e-01  -0.398
-## total.sulfur.dioxide:pH                     -8.964e-04  3.347e-03  -0.268
-## total.sulfur.dioxide:sulphates              -1.285e-02  2.693e-03  -4.770
-## total.sulfur.dioxide:alcohol                -8.177e-04  9.325e-04  -0.877
-## total.sulfur.dioxide:typeWhite               2.812e-03  1.476e-03   1.906
-## total.sulfur.dioxide:alcohol_categoryMedium -5.209e-04  1.256e-03  -0.415
-## total.sulfur.dioxide:alcohol_categoryHigh    3.421e-03  2.465e-03   1.388
-## density:pH                                  -1.123e+02  7.476e+01  -1.502
-## density:sulphates                            1.625e+00  1.176e+02   0.014
-## density:alcohol                              1.563e+00  2.350e+01   0.067
-## density:typeWhite                           -9.785e+01  6.059e+01  -1.615
-## density:alcohol_categoryMedium              -9.826e+01  5.012e+01  -1.961
-## density:alcohol_categoryHigh                -1.467e+02  9.350e+01  -1.569
-## pH:sulphates                                 1.637e+00  6.530e-01   2.507
-## pH:alcohol                                  -1.748e-01  2.039e-01  -0.857
-## pH:typeWhite                                 1.406e+00  5.271e-01   2.667
-## pH:alcohol_categoryMedium                    6.475e-01  3.343e-01   1.937
-## pH:alcohol_categoryHigh                      6.095e-01  6.449e-01   0.945
-## sulphates:alcohol                           -9.610e-02  2.007e-01  -0.479
-## sulphates:typeWhite                          1.257e-01  4.764e-01   0.264
-## sulphates:alcohol_categoryMedium             1.343e-01  2.849e-01   0.471
-## sulphates:alcohol_categoryHigh               4.496e-01  5.538e-01   0.812
-## alcohol:typeWhite                           -1.760e-01  1.374e-01  -1.281
-## alcohol:alcohol_categoryMedium               5.472e-02  8.040e-02   0.681
-## alcohol:alcohol_categoryHigh                -1.324e-01  1.351e-01  -0.980
-## typeWhite:alcohol_categoryMedium             5.738e-02  2.171e-01   0.264
-## typeWhite:alcohol_categoryHigh              -1.362e-01  4.220e-01  -0.323
-##                                             Pr(&gt;|t|)    
-## (Intercept)                                 0.678461    
-## fixed.acidity                               0.375733    
-## volatile.acidity                            0.003337 ** 
-## citric.acid                                 0.015754 *  
-## residual.sugar                              0.772140    
-## chlorides                                   0.241380    
-## free.sulfur.dioxide                         0.245751    
-## total.sulfur.dioxide                        0.661624    
-## density                                     0.676089    
-## pH                                          0.139223    
-## sulphates                                   0.968929    
-## alcohol                                     0.979989    
-## typeWhite                                   0.117073    
-## alcohol_categoryMedium                      0.055366 .  
-## alcohol_categoryHigh                        0.115209    
-## fixed.acidity:volatile.acidity              0.020637 *  
-## fixed.acidity:citric.acid                   0.029401 *  
-## fixed.acidity:residual.sugar                0.103790    
-## fixed.acidity:chlorides                     0.001713 ** 
-## fixed.acidity:free.sulfur.dioxide           0.525997    
-## fixed.acidity:total.sulfur.dioxide          0.891178    
-## fixed.acidity:density                       0.396520    
-## fixed.acidity:pH                            0.000614 ***
-## fixed.acidity:sulphates                     0.255155    
-## fixed.acidity:alcohol                       0.002035 ** 
-## fixed.acidity:typeWhite                     0.675086    
-## fixed.acidity:alcohol_categoryMedium        0.001220 ** 
-## fixed.acidity:alcohol_categoryHigh          0.002446 ** 
-## volatile.acidity:citric.acid                0.082903 .  
-## volatile.acidity:residual.sugar             0.001570 ** 
-## volatile.acidity:chlorides                  0.379534    
-## volatile.acidity:free.sulfur.dioxide        0.091385 .  
-## volatile.acidity:total.sulfur.dioxide       0.288259    
-## volatile.acidity:density                    0.004600 ** 
-## volatile.acidity:pH                         0.779414    
-## volatile.acidity:sulphates                  0.607378    
-## volatile.acidity:alcohol                    2.08e-05 ***
-## volatile.acidity:typeWhite                  0.133153    
-## volatile.acidity:alcohol_categoryMedium     0.093089 .  
-## volatile.acidity:alcohol_categoryHigh       0.719603    
-## citric.acid:residual.sugar                  0.004048 ** 
-## citric.acid:chlorides                       0.263396    
-## citric.acid:free.sulfur.dioxide             0.146468    
-## citric.acid:total.sulfur.dioxide            0.208855    
-## citric.acid:density                         0.019003 *  
-## citric.acid:pH                              0.323197    
-## citric.acid:sulphates                       0.163238    
-## citric.acid:alcohol                         5.41e-07 ***
-## citric.acid:typeWhite                       0.008518 ** 
-## citric.acid:alcohol_categoryMedium          0.006880 ** 
-## citric.acid:alcohol_categoryHigh            8.20e-05 ***
-## residual.sugar:chlorides                    0.054396 .  
-## residual.sugar:free.sulfur.dioxide          0.049688 *  
-## residual.sugar:total.sulfur.dioxide         0.476040    
-## residual.sugar:density                      0.613858    
-## residual.sugar:pH                           0.391530    
-## residual.sugar:sulphates                    0.697615    
-## residual.sugar:alcohol                      0.552498    
-## residual.sugar:typeWhite                    0.597638    
-## residual.sugar:alcohol_categoryMedium       0.304987    
-## residual.sugar:alcohol_categoryHigh         0.446916    
-## chlorides:free.sulfur.dioxide               0.481278    
-## chlorides:total.sulfur.dioxide              0.796317    
-## chlorides:density                           0.195153    
-## chlorides:pH                                0.003824 ** 
-## chlorides:sulphates                         0.000344 ***
-## chlorides:alcohol                           0.164860    
-## chlorides:typeWhite                         0.319125    
-## chlorides:alcohol_categoryMedium            0.013415 *  
-## chlorides:alcohol_categoryHigh              0.134563    
-## free.sulfur.dioxide:total.sulfur.dioxide     &lt; 2e-16 ***
-## free.sulfur.dioxide:density                 0.259887    
-## free.sulfur.dioxide:pH                      0.609046    
-## free.sulfur.dioxide:sulphates               0.001876 ** 
-## free.sulfur.dioxide:alcohol                 0.983886    
-## free.sulfur.dioxide:typeWhite               4.62e-07 ***
-## free.sulfur.dioxide:alcohol_categoryMedium  0.007731 ** 
-## free.sulfur.dioxide:alcohol_categoryHigh    0.020501 *  
-## total.sulfur.dioxide:density                0.690380    
-## total.sulfur.dioxide:pH                     0.788837    
-## total.sulfur.dioxide:sulphates              1.88e-06 ***
-## total.sulfur.dioxide:alcohol                0.380563    
-## total.sulfur.dioxide:typeWhite              0.056757 .  
-## total.sulfur.dioxide:alcohol_categoryMedium 0.678474    
-## total.sulfur.dioxide:alcohol_categoryHigh   0.165253    
-## density:pH                                  0.133151    
-## density:sulphates                           0.988977    
-## density:alcohol                             0.946980    
-## density:typeWhite                           0.106355    
-## density:alcohol_categoryMedium              0.049970 *  
-## density:alcohol_categoryHigh                0.116757    
-## pH:sulphates                                0.012197 *  
-## pH:alcohol                                  0.391471    
-## pH:typeWhite                                0.007667 ** 
-## pH:alcohol_categoryMedium                   0.052833 .  
-## pH:alcohol_categoryHigh                     0.344688    
-## sulphates:alcohol                           0.631989    
-## sulphates:typeWhite                         0.791810    
-## sulphates:alcohol_categoryMedium            0.637365    
-## sulphates:alcohol_categoryHigh              0.416994    
-## alcohol:typeWhite                           0.200356    
-## alcohol:alcohol_categoryMedium              0.496134    
-## alcohol:alcohol_categoryHigh                0.327210    
-## typeWhite:alcohol_categoryMedium            0.791510    
-## typeWhite:alcohol_categoryHigh              0.746938    
+##                                            Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                              -2.159e+02  2.803e+02  -0.770 0.441105
+## fixed.acidity                             7.462e+00  7.153e+00   1.043 0.296930
+## volatile.acidity                         -2.377e+02  9.984e+01  -2.380 0.017322
+## citric.acid                              -2.594e+02  1.112e+02  -2.333 0.019676
+## residual.sugar                           -6.047e-01  7.676e-01  -0.788 0.430867
+## chlorides                                -9.685e+02  5.045e+02  -1.920 0.054929
+## free.sulfur.dioxide                      -2.443e+00  1.363e+00  -1.792 0.073172
+## total.sulfur.dioxide                      3.200e-01  4.905e-01   0.652 0.514148
+## density                                   2.292e+02  2.802e+02   0.818 0.413497
+## pH                                        7.022e+01  7.362e+01   0.954 0.340232
+## sulphates                                 1.470e+01  1.150e+02   0.128 0.898298
+## alcohol                                   2.215e+01  6.175e+00   3.587 0.000337
+## typeWhite                                 1.080e+02  5.904e+01   1.829 0.067383
+## fixed.acidity:volatile.acidity           -2.697e-01  1.261e-01  -2.139 0.032486
+## fixed.acidity:citric.acid                -2.435e-01  1.197e-01  -2.035 0.041933
+## fixed.acidity:residual.sugar              7.026e-03  4.007e-03   1.753 0.079570
+## fixed.acidity:chlorides                  -1.822e+00  5.485e-01  -3.322 0.000899
+## fixed.acidity:free.sulfur.dioxide         5.590e-05  1.424e-03   0.039 0.968685
+## fixed.acidity:total.sulfur.dioxide       -1.997e-04  5.620e-04  -0.355 0.722334
+## fixed.acidity:density                    -7.843e+00  7.097e+00  -1.105 0.269135
+## fixed.acidity:pH                          2.318e-01  6.624e-02   3.500 0.000468
+## fixed.acidity:sulphates                   1.813e-01  1.191e-01   1.522 0.128001
+## fixed.acidity:alcohol                    -1.404e-02  1.340e-02  -1.047 0.295071
+## fixed.acidity:typeWhite                   5.272e-03  7.656e-02   0.069 0.945101
+## volatile.acidity:citric.acid              1.220e+00  5.671e-01   2.150 0.031561
+## volatile.acidity:residual.sugar          -1.182e-01  4.580e-02  -2.580 0.009891
+## volatile.acidity:chlorides                2.052e+00  2.557e+00   0.803 0.422151
+## volatile.acidity:free.sulfur.dioxide      7.784e-03  7.357e-03   1.058 0.290073
+## volatile.acidity:total.sulfur.dioxide     4.556e-03  2.707e-03   1.683 0.092458
+## volatile.acidity:density                  2.323e+02  1.015e+02   2.289 0.022125
+## volatile.acidity:pH                       3.270e-02  7.828e-01   0.042 0.966684
+## volatile.acidity:sulphates               -2.871e-01  6.518e-01  -0.440 0.659680
+## volatile.acidity:alcohol                  6.793e-01  1.302e-01   5.219 1.86e-07
+## volatile.acidity:typeWhite               -8.299e-01  3.860e-01  -2.150 0.031602
+## citric.acid:residual.sugar               -1.229e-01  4.414e-02  -2.783 0.005397
+## citric.acid:chlorides                     2.409e+00  2.276e+00   1.059 0.289761
+## citric.acid:free.sulfur.dioxide           9.613e-03  6.374e-03   1.508 0.131581
+## citric.acid:total.sulfur.dioxide         -2.498e-03  2.443e-03  -1.022 0.306676
+## citric.acid:density                       2.596e+02  1.124e+02   2.309 0.020965
+## citric.acid:pH                           -6.954e-01  7.320e-01  -0.950 0.342178
+## citric.acid:sulphates                    -1.164e+00  7.000e-01  -1.663 0.096453
+## citric.acid:alcohol                       4.815e-01  1.448e-01   3.324 0.000892
+## citric.acid:typeWhite                     1.072e+00  4.480e-01   2.393 0.016728
+## residual.sugar:chlorides                 -5.565e-01  2.344e-01  -2.374 0.017617
+## residual.sugar:free.sulfur.dioxide       -1.386e-03  5.420e-04  -2.558 0.010550
+## residual.sugar:total.sulfur.dioxide       2.122e-04  2.025e-04   1.048 0.294617
+## residual.sugar:density                    7.980e-01  7.488e-01   1.066 0.286565
+## residual.sugar:pH                        -4.606e-02  2.971e-02  -1.550 0.121082
+## residual.sugar:sulphates                 -1.230e-02  4.804e-02  -0.256 0.797883
+## residual.sugar:alcohol                    8.889e-03  3.916e-03   2.270 0.023243
+## residual.sugar:typeWhite                  2.038e-02  2.863e-02   0.712 0.476582
+## chlorides:free.sulfur.dioxide             9.673e-03  2.834e-02   0.341 0.732882
+## chlorides:total.sulfur.dioxide           -7.535e-03  1.532e-02  -0.492 0.622833
+## chlorides:density                         1.028e+03  5.097e+02   2.018 0.043655
+## chlorides:pH                             -1.213e+01  3.933e+00  -3.085 0.002044
+## chlorides:sulphates                      -7.383e+00  1.970e+00  -3.747 0.000180
+## chlorides:alcohol                         1.941e-01  7.042e-01   0.276 0.782878
+## chlorides:typeWhite                      -1.209e+00  2.512e+00  -0.481 0.630298
+## free.sulfur.dioxide:total.sulfur.dioxide -9.463e-05  8.758e-06 -10.805  &lt; 2e-16
+## free.sulfur.dioxide:density               2.388e+00  1.380e+00   1.731 0.083494
+## free.sulfur.dioxide:pH                    2.484e-03  7.617e-03   0.326 0.744307
+## free.sulfur.dioxide:sulphates             1.958e-02  6.369e-03   3.075 0.002114
+## free.sulfur.dioxide:alcohol               4.648e-03  1.831e-03   2.539 0.011146
+## free.sulfur.dioxide:typeWhite             2.494e-02  4.873e-03   5.117 3.19e-07
+## total.sulfur.dioxide:density             -3.016e-01  4.983e-01  -0.605 0.545025
+## total.sulfur.dioxide:pH                  -2.407e-03  3.280e-03  -0.734 0.462973
+## total.sulfur.dioxide:sulphates           -1.347e-02  2.647e-03  -5.088 3.73e-07
+## total.sulfur.dioxide:alcohol             -4.809e-04  6.583e-04  -0.731 0.465070
+## total.sulfur.dioxide:typeWhite            2.064e-03  1.443e-03   1.431 0.152507
+## density:pH                               -7.299e+01  7.338e+01  -0.995 0.319939
+## density:sulphates                        -1.877e+01  1.163e+02  -0.161 0.871729
+## density:alcohol                          -2.246e+01  6.312e+00  -3.559 0.000375
+## density:typeWhite                        -1.141e+02  5.990e+01  -1.904 0.056939
+## pH:sulphates                              1.709e+00  6.501e-01   2.628 0.008606
+## pH:alcohol                                2.062e-02  1.144e-01   0.180 0.856882
+## pH:typeWhite                              1.814e+00  5.175e-01   3.506 0.000457
+## sulphates:alcohol                        -3.450e-02  1.395e-01  -0.247 0.804627
+## sulphates:typeWhite                       2.314e-01  4.725e-01   0.490 0.624366
+## alcohol:typeWhite                        -1.665e-01  8.576e-02  -1.942 0.052192
+##                                             
+## (Intercept)                                 
+## fixed.acidity                               
+## volatile.acidity                         *  
+## citric.acid                              *  
+## residual.sugar                              
+## chlorides                                .  
+## free.sulfur.dioxide                      .  
+## total.sulfur.dioxide                        
+## density                                     
+## pH                                          
+## sulphates                                   
+## alcohol                                  ***
+## typeWhite                                .  
+## fixed.acidity:volatile.acidity           *  
+## fixed.acidity:citric.acid                *  
+## fixed.acidity:residual.sugar             .  
+## fixed.acidity:chlorides                  ***
+## fixed.acidity:free.sulfur.dioxide           
+## fixed.acidity:total.sulfur.dioxide          
+## fixed.acidity:density                       
+## fixed.acidity:pH                         ***
+## fixed.acidity:sulphates                     
+## fixed.acidity:alcohol                       
+## fixed.acidity:typeWhite                     
+## volatile.acidity:citric.acid             *  
+## volatile.acidity:residual.sugar          ** 
+## volatile.acidity:chlorides                  
+## volatile.acidity:free.sulfur.dioxide        
+## volatile.acidity:total.sulfur.dioxide    .  
+## volatile.acidity:density                 *  
+## volatile.acidity:pH                         
+## volatile.acidity:sulphates                  
+## volatile.acidity:alcohol                 ***
+## volatile.acidity:typeWhite               *  
+## citric.acid:residual.sugar               ** 
+## citric.acid:chlorides                       
+## citric.acid:free.sulfur.dioxide             
+## citric.acid:total.sulfur.dioxide            
+## citric.acid:density                      *  
+## citric.acid:pH                              
+## citric.acid:sulphates                    .  
+## citric.acid:alcohol                      ***
+## citric.acid:typeWhite                    *  
+## residual.sugar:chlorides                 *  
+## residual.sugar:free.sulfur.dioxide       *  
+## residual.sugar:total.sulfur.dioxide         
+## residual.sugar:density                      
+## residual.sugar:pH                           
+## residual.sugar:sulphates                    
+## residual.sugar:alcohol                   *  
+## residual.sugar:typeWhite                    
+## chlorides:free.sulfur.dioxide               
+## chlorides:total.sulfur.dioxide              
+## chlorides:density                        *  
+## chlorides:pH                             ** 
+## chlorides:sulphates                      ***
+## chlorides:alcohol                           
+## chlorides:typeWhite                         
+## free.sulfur.dioxide:total.sulfur.dioxide ***
+## free.sulfur.dioxide:density              .  
+## free.sulfur.dioxide:pH                      
+## free.sulfur.dioxide:sulphates            ** 
+## free.sulfur.dioxide:alcohol              *  
+## free.sulfur.dioxide:typeWhite            ***
+## total.sulfur.dioxide:density                
+## total.sulfur.dioxide:pH                     
+## total.sulfur.dioxide:sulphates           ***
+## total.sulfur.dioxide:alcohol                
+## total.sulfur.dioxide:typeWhite              
+## density:pH                                  
+## density:sulphates                           
+## density:alcohol                          ***
+## density:typeWhite                        .  
+## pH:sulphates                             ** 
+## pH:alcohol                                  
+## pH:typeWhite                             ***
+## sulphates:alcohol                           
+## sulphates:typeWhite                         
+## alcohol:typeWhite                        .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.6987 on 6392 degrees of freedom
-## Multiple R-squared:   0.37,  Adjusted R-squared:  0.3597 
-## F-statistic:  36.1 on 104 and 6392 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.7017 on 6418 degrees of freedom
+## Multiple R-squared:  0.362,  Adjusted R-squared:  0.3543 
+## F-statistic: 46.69 on 78 and 6418 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>
+<pre class="r"><code># Histogram of Quality with Normal Distribution Overlay
+hist(wine_data$quality,
+     breaks = 10,  # Adjust number of bins
+     probability = TRUE,  # Scale histogram to show probabilities
+     main = &quot;Histogram of Wine Quality with Normal Distribution&quot;,
+     xlab = &quot;Wine Quality&quot;,
+     col = &quot;lightblue&quot;,
+     border = &quot;black&quot;)
+
+# Calculate scaling factor for the normal curve
+scale_factor = 0.8 / max(dnorm(x = seq(min(wine_data$quality), max(wine_data$quality), length = 100),
+                               mean = mean(wine_data$quality),
+                               sd = sd(wine_data$quality)))
+
+# Overlay scaled normal distribution curve
+curve(dnorm(x, mean = mean(wine_data$quality), sd = sd(wine_data$quality)) * scale_factor,
+      col = &quot;red&quot;,
+      lwd = 2,
+      add = TRUE)</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
 <pre class="r"><code># Scatter plot: Volatile Acidity vs Quality
 plot(wine_data$volatile.acidity, wine_data$quality,
      main = &quot;Volatile Acidity vs Wine Quality&quot;,
