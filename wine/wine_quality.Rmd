@@ -1,9 +1,27 @@
 ---
-title: "wine"
-author: "Curtis Easton"
-date: "2024-11-20"
-output: html_document
+title: 'Data Analysis Project'
+author: "STAT 420, Fall 2024, C. Easton, A. Roh, T. Toter, A. Treptow"
+date: 'December xx, 2024'
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    theme: readable
+    toc: yes
+urlcolor: cyan
 ---
+
+**Introduction:**
+
+In this data analysis study we appled the principles we learned during the semester to iterate on a linear regression model.
+
+For our case study, we chose a "Wine Quality" dataset from the UC Irvine Machine Learning Repository. The data relates to red and white variants of the Portuguese vinho verde wine samples. We drew the data from the following site:
+
+  https://archive.ics.uci.edu/dataset/186/wine+quality
+
+Each wine sample contains a record of 10 numerically measured physicochemical attributes, such as acidity, residual sugar, chlorides, and pH. We combined two datasets (one for white wine and one for red wine), resulting in an additional categorical variable for wine type.
+
+The 11 attributes listed above served as our source predictor variables. A final attribute, measuring quality, served as our response variable. Each quality measurement is a subjectively assigned integer, ranging from 1 to 10. Our goal was to build a model that could use the objectively measured predictors as inputs to estimate how a human would rate the wine.
 
 ```{r setup}
 
