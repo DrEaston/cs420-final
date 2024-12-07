@@ -3,11 +3,11 @@ title: 'Data Analysis Project'
 author: "STAT 420, Fall 2024, C. Easton, A. Roh, T. Toter, A. Treptow"
 date: 'December xx, 2024'
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: 2
   html_document:
     theme: readable
+    toc: yes
+    toc_depth: 2
+  pdf_document:
     toc: yes
     toc_depth: 2
 urlcolor: cyan
@@ -238,9 +238,14 @@ corrplot(cor_matrix,
 )
 ```
 
-## Linear Model Assumption Diagnostics
+## Linear Model Assumption Diagnostic Plots
+```{r}
+plot(model_both_aic, which = 1, main = "Residuals vs Fitted")
+```
 
-
+```{r}
+plot(model_both_aic, which = 2, main = "Normal Q-Q Plot")
+```
 
 # Discussion
 
