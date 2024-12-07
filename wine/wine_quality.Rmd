@@ -68,31 +68,36 @@ nrow(wine_data)
 We began by creating an additive model using all predictors (without transformations). This model served as a baseline to judge improvements for upcoming iterations.
 
 ```{r}
-# Note to Team: I renamed this model `full_add_model` to be more descriptive
 full_add_model = lm(quality ~ ., data = wine_data)
 summary(full_add_model)
 ```
 ## Log Transformed Predictors
 
-The predictor histograms showed that some of the predictors appear to be normally distributed, but other predictors are skewed. We experimented with a full model using log transformed variables for the ones that appeared especially skewed.
+The predictor histograms showed that some of the predictors appear to be normally distributed, but other predictors are skewed. We experimented with a full model using log transformed variables for the ones that appeared especially skewed. We also tried a model with log transformed variables and interactive terms.
 
 ```{r}
 model_add = lm(quality ~ ., data = wine_data)
-model_log = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid + residual.sugar + chlorides + log(free.sulfur.dioxide) + total.sulfur.dioxide + density + (pH) + (sulphates) + (alcohol) + type, data = wine_data)
-```
-
-```{r}
-model_log_int = lm(quality ~ (fixed.acidity + log(volatile.acidity) + citric.acid + residual.sugar + chlorides + log(free.sulfur.dioxide) + total.sulfur.dioxide + density + (pH) + (sulphates) + (alcohol) + type)^2, data = wine_data)
+model_log = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid + 
+                 residual.sugar + chlorides + log(free.sulfur.dioxide) + 
+                 total.sulfur.dioxide + density + (pH) + (sulphates) + 
+                 (alcohol) + type, data = wine_data)
+model_log_int = lm(quality ~ (fixed.acidity + log(volatile.acidity) + 
+                                citric.acid + residual.sugar + chlorides + 
+                                log(free.sulfur.dioxide) + 
+                                total.sulfur.dioxide + density + (pH) + 
+                                (sulphates) + (alcohol) + type)^2, 
+                   data = wine_data)
 ```
 ## Fit a Full Interaction Model
 
-Next, we created an interaction model using all predictors (without transformations). This model served as a baseline to judge improvements for upcoming iterations.
+Next, we created an interaction model using all predictors (without transformations).
 
 ```{r}
-# Note to Team: I renamed this model `full_int_model` to be more descriptive
 full_int_model = lm(quality ~ .^2, data = wine_data)
 summary(full_int_model)
 ```
+
+## Compare the Adjusted R-Squared for Various Models
 
 ```{r}
 summary(model_add)$adj.r.squared
@@ -112,7 +117,7 @@ vif_values = vif(full_add_model)
 vif_values
 ```
 
-## AIC and BIC Analysis
+## Akaike Information Criterion (AIC) and Bayesian Information Criteria (BIC) Modelling
 
 ```{r}
 model_bac_aic = step(model_log_int, trace = 0)
@@ -121,6 +126,14 @@ model_both_aic = step(model_log_int, direction = "both", trace = 0)
 summary(model_bac_aic)$adj.r.squared
 summary(model_bac_bic)$adj.r.squared
 summary(model_both_aic)$adj.r.squared
+```
+
+## Analysis of Variance (ANOVA)
+
+```{r}
+anova(model_bac_aic, model_log_int)
+anova(model_bac_bic, model_log_int)
+anova(model_both_aic, model_log_int)
 ```
 
 # Results
@@ -223,7 +236,22 @@ corrplot(cor_matrix,
          mar = c(0, 0, 1, 0),
          col = colorRampPalette(c("navy", "white", "brown"))(200)
 )
-
 ```
 
+## Linear Model Assumption Diagnostics
 
+
+
+# Discussion
+
+After considering several different models, our best model was...
+
+TODO: (Describe the top model.)
+
+This model achieved...
+
+TODO: (Describe the performance of this model, using relevant values pulled from the model summaries.)
+
+The steps and techniques we followed to arrive at this model included building a preliminary full additive model, transforming skewed predictors, experimenting with polynomial terms and interactions, and eliminating non-significant predictors. With each new candidate model, we analyzed how it compared to its predecessor models to assess whether we were headed in a productive direction.
+
+Importantly, we did a final check on our final model to ensure that it obeyed the linear model assumptions. 
