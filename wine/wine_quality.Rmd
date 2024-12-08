@@ -52,15 +52,14 @@ str(wine_data)
 
 A few data points departed noticeably from the vast majority of the rest of the data. In the real world, we would carefully exam these points and consider why they might be abberations. However, that type of analysis is outside the scope of this modeling exercise, so we deviated from normal practices and simply removed the outliers to allow us to pursue a model that handles the remainder of the data.
 
-TODO: (Add any additional commentary from Alexander.)
+We simply view the data in a table. Then, we simply view columns from biggest to smallest values, and notice that there is a wine observation with a residual sugar value of 65.80, more than double that of the next wine observation. We repeat this again for the free sulfur dioxide column, and notice that the wine observation has almost double the value as the next observation. Keeping these data will greatly hinder our ability to read and interpret the pairs plots, so we remove them.
 
 ```{r}
 res_sugar_6580 = which(wine_data$residual.sugar == 65.80)
 free_sulf_dio_289 = which(wine_data$free.sulfur.dioxide == 289.0)
-dens_10103 = which(wine_data$density == 1.0103)
-remove_idx = c(res_sugar_6580, free_sulf_dio_289, dens_10103)
+
+remove_idx = c(res_sugar_6580, free_sulf_dio_289)
 wine_data = wine_data[-remove_idx, ]
-nrow(wine_data)
 ```
 
 ## Fit a Full Additive Model
