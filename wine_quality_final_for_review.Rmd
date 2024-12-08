@@ -1,0 +1,453 @@
+---
+title: 'Data Analysis Project'
+author: "STAT 420, Fall 2024, C. Easton, A. Roh, T. Toter, A. Treptow"
+date: 'December xx, 2024'
+output:
+  html_document:
+    theme: readable
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: 2
+urlcolor: cyan
+---
+
+# Introduction
+
+In this data analysis study we applied the principles we learned during the semester to iterate on a linear regression model.
+
+For our case study, we chose a "Wine Quality" dataset from the UC Irvine Machine Learning Repository. The data relates to red and white variants of the Portuguese vinho verde wine samples. We drew the data from the following site:
+
+  https://archive.ics.uci.edu/dataset/186/wine+quality
+
+Each row in the dataset of wine samples contains a record of 11 numerically measured physicochemical attributes, such as acidity, residual sugar, chlorides, and pH. We combined two datasets (one for white wine and one for red wine), resulting in an additional categorical attribute for wine type.
+
+The 12 attributes listed above served as our source predictor variables. A final attribute from the dataset measures quality, and serves as our response variable. Each quality measurement is a subjectively-assigned integer, ranging from 1 to 10. Our goal was to build a model that could use the objectively measured predictors as inputs to estimate how a human would rate each wine.
+
+# Methods
+
+## Setup
+
+```{r setup}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+#library(knitr)
+#opts_chunk$set(cache = TRUE, autodep = TRUE)
+```
+
+## Load and Examine the Data
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+
+red_wine = read.csv("winequality-red.csv", sep = ";")
+white_wine = read.csv("winequality-white.csv", sep = ";")
+# Add categorical variables for wine type
+red_wine$type = "Red"
+white_wine$type = "White"
+wine_data = bind_rows(red_wine, white_wine) # Combine the two datasets
+wine_data$type = as.factor(wine_data$type)
+str(wine_data)
+```
+
+## Remove Outliers
+
+A few data points departed noticeably from the vast majority of the rest of the data. In the real world, we would carefully exam these points and consider why they might be abberations. However, that type of analysis is outside the scope of this modeling exercise, so we deviated from normal practices and simply removed the outliers to allow us to pursue a model that handles the remainder of the data.
+
+We simply view the data in a table. Then, we simply view columns from biggest to smallest values, and notice that there is a wine observation with a residual sugar value of 65.80, more than double that of the next wine observation.
+
+```{r}
+desc_res_sugar = wine_data[order(wine_data$residual.sugar, decreasing = TRUE), ]
+head(desc_res_sugar, n = 3)
+```
+
+We repeat this again for the free sulfur dioxide column, and notice that the wine observation has almost double the value as the next observation.
+
+```{r}
+desc_free_sulf_dio = wine_data[order(wine_data$free.sulfur.dioxide, decreasing = TRUE), ]
+head(desc_free_sulf_dio, n = 3)
+```
+
+Keeping these data will greatly hinder our ability to read and interpret the pairs plots, so we remove them.
+
+```{r message=FALSE, warning=FALSE}
+res_sugar_6580 = which(wine_data$residual.sugar == 65.80)
+free_sulf_dio_289 = which(wine_data$free.sulfur.dioxide == 289.0)
+
+remove_idx = c(res_sugar_6580, free_sulf_dio_289)
+wine_data = wine_data[-remove_idx, ]
+```
+
+
+## Split Data Into Train and Test
+
+```{r}
+trn_idx = sample(nrow(wine_data), size = 0.8 * nrow(wine_data))
+wine_data_trn = wine_data[trn_idx, ]
+wine_data_tst = wine_data[-trn_idx, ]
+```
+
+## Fit a Full Additive Model
+
+We began by creating an additive model using all predictors (without transformations). This model served as a baseline to judge improvements for upcoming iterations.
+
+```{r message=FALSE, warning=FALSE}
+full_add_model = lm(quality ~ ., data = wine_data_trn)
+summary(full_add_model)
+```
+## Log Transformed Predictors
+
+To check whether some predictors should be log transformed, we fitted a model which was the additive model plus logs of all the variables besides citric acid (which had zero values). 
+
+```{r message=FALSE, warning=FALSE}
+model_add = lm(quality ~ ., data = wine_data_trn)
+
+model_add_log = lm(
+  quality ~ fixed.acidity + log(fixed.acidity) +
+    volatile.acidity + log(volatile.acidity) +
+    citric.acid  +
+    residual.sugar + log(residual.sugar) +
+    chlorides + log(chlorides) +
+    free.sulfur.dioxide + log(free.sulfur.dioxide) +
+    total.sulfur.dioxide + log(total.sulfur.dioxide) +
+    density + log(density) +
+    pH + log(pH) +
+    sulphates + log(sulphates) +
+    alcohol + log(alcohol) +
+    type,
+  data = wine_data_trn
+)
+
+summary(model_add_log)
+
+
+```
+
+
+In the summary of the model, we identified volatile.acidity, residual.sugar, free.sulfur.dioxide and total.sulfur.dioxide as predictors that had smaller p values when log transformed. 
+
+
+
+
+```{r message=FALSE, warning=FALSE}
+
+
+model_log1 = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid + 
+                 residual.sugar + chlorides + free.sulfur.dioxide + 
+                 total.sulfur.dioxide + density + pH + sulphates + 
+                 alcohol + type, data = wine_data_trn)
+                 
+model_log2 = lm(quality ~ fixed.acidity + volatile.acidity + citric.acid + 
+                 log(residual.sugar) + chlorides + free.sulfur.dioxide + 
+                 total.sulfur.dioxide + density + pH + sulphates + 
+                 alcohol + type, data = wine_data_trn)
+                 
+model_log3 = lm(quality ~ fixed.acidity + volatile.acidity + citric.acid + 
+                 residual.sugar + chlorides + log(free.sulfur.dioxide) + 
+                 total.sulfur.dioxide + density + pH + sulphates + 
+                 alcohol + type, data = wine_data_trn)
+                 
+model_log4 = lm(quality ~ fixed.acidity + volatile.acidity + citric.acid + 
+                 residual.sugar + chlorides + free.sulfur.dioxide + 
+                 log(total.sulfur.dioxide) + density + pH + sulphates + 
+                 alcohol + type, data = wine_data_trn)
+
+summary(model_add)$adj.r.squared
+summary(model_log1)$adj.r.squared
+summary(model_log2)$adj.r.squared
+summary(model_log3)$adj.r.squared
+summary(model_log4)$adj.r.squared
+
+
+```
+We noted improvement in adjusted r squared when free.sulfur.dioxide and volatile.acidity were logged. These two were then log transformed in further models
+
+
+```{r message=FALSE, warning=FALSE}
+
+model_log = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid + 
+                 residual.sugar + chlorides + log(free.sulfur.dioxide) + 
+                 total.sulfur.dioxide + density + pH + sulphates + 
+                 alcohol + type, data = wine_data_trn)
+
+
+```
+
+## Variance Inflation Factors
+
+We calculated the Variance Inflation Factors (VIF) to help us identify issues of multicollinearity between predictors.
+
+```{r message=FALSE, warning=FALSE}
+if (!require(car)) install.packages("car")
+library(car)
+vif_values = vif(model_log)
+vif_values
+
+
+```
+
+## Predictor Correlation Heatmap
+```{r message=FALSE, warning=FALSE}
+if (!require(corrplot)) install.packages("corrplot")
+library(corrplot)
+
+numeric_data = wine_data_trn %>%
+  select(-type, -quality) # Considers numeric predictors only
+cor_matrix = cor(numeric_data, use = "complete.obs")
+par(mar = c(0, 0, 5, 0))
+corrplot(cor_matrix, 
+         method = "color", 
+         addCoef.col = "black", 
+         tl.cex = 0.9,
+         tl.col = "black",
+         tl.srt = 45,
+         number.cex = 0.7,
+         main = "Correlation Heatmap", 
+         cl.cex = 0.8,
+         cl.ratio = 0.2,
+         mar = c(0, 0, 1, 0),
+         col = colorRampPalette(c("navy", "white", "brown"))(200)
+)
+```
+
+
+We noticed that density was highly related to many other variables. We tried removing density
+
+``` {r}
+
+model_log_noD = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid + 
+                 residual.sugar + chlorides + log(free.sulfur.dioxide) + 
+                 total.sulfur.dioxide + pH + sulphates + 
+                 alcohol + type, data = wine_data_trn)
+
+vif_values = vif(model_log_noD)
+vif_values
+
+summary(model_log_noD)$adj.r.squared
+
+```
+
+
+We found that removing density lowered the worst of the VIF values, without changing adjusted r squared much
+
+## Compare the Adjusted R-Squared for Various Models
+
+```{r message=FALSE, warning=FALSE}
+summary(model_add)$adj.r.squared
+summary(model_log)$adj.r.squared
+summary(model_log_noD)$adj.r.squared
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- We choose our no-density model as our best model so far, as it significantly improves our VIF values while maintaining a very high adjusted r squared value (relative to our other models). We then  -->
+
+``` {r}
+
+model_log_int = lm(quality ~ (fixed.acidity + log(volatile.acidity) + 
+                                citric.acid + residual.sugar + chlorides + 
+                                log(free.sulfur.dioxide) + 
+                                total.sulfur.dioxide + pH + 
+                                sulphates + alcohol + type)^2, 
+                   data = wine_data_trn)
+
+```
+
+
+
+```{r message=FALSE, warning=FALSE}
+mod_log_int_cd = cooks.distance(model_log_int)
+
+mod_log_int_fixed = lm(quality ~ (fixed.acidity + log(volatile.acidity) + citric.acid + residual.sugar +
+                                    chlorides + log(free.sulfur.dioxide) + total.sulfur.dioxide +
+                                    pH + sulphates + alcohol + type)^2, 
+                       data = wine_data_trn, 
+                       subset = mod_log_int_cd < 4 / length(mod_log_int_cd))
+
+summary(mod_log_int_fixed)$adj.r.squared
+```
+
+
+## Akaike Information Criterion (AIC) and Bayesian Information Criteria (BIC) Modelling
+
+```{r message=FALSE, warning=FALSE}
+model_bac_aic = step(mod_log_int_fixed, trace = 0)
+model_bac_bic = step(mod_log_int_fixed, k = log(nrow(wine_data_trn)), trace = 0)
+summary(model_bac_aic)$adj.r.squared
+summary(model_bac_bic)$adj.r.squared
+```
+
+
+## Identify candidates for quadratic model
+```{r}
+model_squared = lm(
+  quality ~ fixed.acidity + I(fixed.acidity^2) +
+    volatile.acidity + I(volatile.acidity^2) +
+    citric.acid + I(citric.acid^2) +
+    residual.sugar + I(residual.sugar^2) +
+    chlorides + I(chlorides^2) +
+    free.sulfur.dioxide + I(free.sulfur.dioxide^2) +
+    total.sulfur.dioxide + I(total.sulfur.dioxide^2) +
+    pH + I(pH^2) +
+    sulphates + I(sulphates^2) +
+    alcohol + I(alcohol^2) +
+    type,
+  data = wine_data)
+  
+# summary(model_squared)
+
+
+n = nrow(wine_data)
+model_squared_bic = step(
+  model_squared,
+  direction = "backward",
+  k = log(n), trace = FALSE  # BIC criterion
+)
+
+summary(model_squared_bic)
+```
+
+## Tried squaring residual.sugar (but resulted in lower adj r^2)
+```{r}
+res_sugar_2_model = lm(quality ~ fixed.acidity + log(volatile.acidity) +
+                         citric.acid + chlorides + log(free.sulfur.dioxide) +
+                         total.sulfur.dioxide + pH + sulphates + alcohol + type +
+                         fixed.acidity:log(volatile.acidity) + fixed.acidity:citric.acid +
+                         fixed.acidity:I(residual.sugar^2) + fixed.acidity:chlorides +
+                         fixed.acidity:log(free.sulfur.dioxide) + fixed.acidity:pH +
+                         fixed.acidity:alcohol + fixed.acidity:type +
+                         log(volatile.acidity):citric.acid +
+                         log(volatile.acidity):I(residual.sugar^2) + 
+                         log(volatile.acidity):log(free.sulfur.dioxide) +
+                         log(volatile.acidity):pH + log(volatile.acidity):sulphates +
+                         log(volatile.acidity):alcohol + log(volatile.acidity):type +
+                         citric.acid:total.sulfur.dioxide + citric.acid:alcohol +
+                         citric.acid:type + I(residual.sugar^2):chlorides +
+                         I(residual.sugar^2):log(free.sulfur.dioxide) +
+                         I(residual.sugar^2):total.sulfur.dioxide + I(residual.sugar^2):pH +
+                         I(residual.sugar^2):alcohol + I(residual.sugar^2):type +
+                         chlorides:pH + chlorides:sulphates + chlorides:alcohol +
+                         chlorides:type + log(free.sulfur.dioxide):total.sulfur.dioxide +
+                         log(free.sulfur.dioxide):pH + log(free.sulfur.dioxide):sulphates +
+                         log(free.sulfur.dioxide):type + total.sulfur.dioxide:pH +
+                         total.sulfur.dioxide:sulphates + pH:sulphates + pH:type +
+                         sulphates:type + I(residual.sugar^2),
+              data = wine_data_trn)
+summary(res_sugar_2_model)$adj.r.squared
+```
+
+## Also Tried squaring alcohol
+```{r}
+alc_2_model = lm(quality ~ fixed.acidity + log(volatile.acidity) +
+                   citric.acid + chlorides + log(free.sulfur.dioxide) +
+                   total.sulfur.dioxide + pH + sulphates + residual.sugar +
+                   type + fixed.acidity:log(volatile.acidity) +
+                   fixed.acidity:citric.acid + fixed.acidity:residual.sugar +
+                   fixed.acidity:chlorides + fixed.acidity:log(free.sulfur.dioxide) +
+                   fixed.acidity:pH + fixed.acidity:I(alcohol^2) + fixed.acidity:type +
+                   log(volatile.acidity):citric.acid + log(volatile.acidity):residual.sugar +
+                   log(volatile.acidity):log(free.sulfur.dioxide) + log(volatile.acidity):pH +
+                   log(volatile.acidity):sulphates + log(volatile.acidity):I(alcohol^2) +
+                   log(volatile.acidity):type + citric.acid:total.sulfur.dioxide +
+                   citric.acid:I(alcohol^2) + citric.acid:type + residual.sugar:chlorides +
+                   residual.sugar:log(free.sulfur.dioxide) +
+                   residual.sugar:total.sulfur.dioxide + residual.sugar:pH +
+                   residual.sugar:I(alcohol^2) + residual.sugar:type + chlorides:pH +
+                   chlorides:sulphates + chlorides:I(alcohol^2) + chlorides:type +
+                   log(free.sulfur.dioxide):total.sulfur.dioxide +
+                   log(free.sulfur.dioxide):pH + log(free.sulfur.dioxide):sulphates +
+                   log(free.sulfur.dioxide):type + total.sulfur.dioxide:pH +
+                   total.sulfur.dioxide:sulphates + pH:sulphates + pH:type + sulphates:type +
+                   I(alcohol^2),
+              data = wine_data_trn)
+summary(alc_2_model)$adj.r.squared
+```
+
+
+## Analysis of Variance (ANOVA)
+
+```{r message=FALSE, warning=FALSE}
+anova(model_bac_aic, mod_log_int_fixed)
+anova(model_bac_bic, mod_log_int_fixed)
+
+length(model_bac_aic$coefficients)
+length(model_bac_bic$coefficients)
+
+vif(model_bac_aic)
+vif(model_bac_bic)
+
+summary(model_bac_aic)
+```
+
+
+# Results
+
+
+
+
+## Linear Model Assumption Diagnostic Plots
+```{r message=FALSE, warning=FALSE}
+plot(model_bac_aic, which = 1, main = "Residuals vs Fitted")
+```
+
+```{r message=FALSE, warning=FALSE}
+plot(model_bac_aic, which = 2, main = "Normal Q-Q Plot")
+```
+
+## Evaluating our Model
+
+```{r}
+get_loocv_rmse = function(model) {
+  sqrt(mean((resid(model) / (1 - hatvalues(model))) ^ 2))
+}
+```
+
+```{r}
+rmse = function(actual, predicted) {
+  sqrt(mean((actual - predicted)^2))
+}
+```
+
+```{r}
+rmse(wine_data_trn$quality, predict(model_bac_aic, wine_data_trn))
+rmse(wine_data_tst$quality, predict(model_bac_aic, wine_data_tst))
+```
+
+
+# Discussion
+
+We arrived at our best model through a backward step AIC upon an interaction model, containing transformations on selected predictors.
+
+To arrive at this model, we took the steps of examining a full additive model, log transforming the variables with skewed distributions, addressing multicollinearity between predictors, experimenting with polynomial terms and interactions, exploring improvements through AIC and BIC modeling, and verifying our progress through ANOVA comparison.
+
+With each new candidate model, we analyzed how it compared to its predecessor models to assess whether we were headed in a productive direction. We reviewed the summaries of the candidate models, carefully considering outputs such as p-values and adjusted R-squared, to guide our next steps for how to adjust to a better model.
+
+(TODO: Insert relevant measurements for the performance of the model.)
+
+This model achieved an Adjusted R-squared of `r summary(model_bac_aic)$adj.r.squared`.
+
+Performing backward BIC delivered a result of `r length(model_bac_aic$coefficients)` coefficients, but...
+(TODO: )
+
+Importantly, we did a final check on our final model to ensure that it obeyed the linear model assumptions.
