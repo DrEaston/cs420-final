@@ -76,10 +76,12 @@ The predictor histograms showed that some of the predictors appear to be normall
 
 ```{r}
 model_add = lm(quality ~ ., data = wine_data)
+
 model_log = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid + 
                  residual.sugar + chlorides + log(free.sulfur.dioxide) + 
                  total.sulfur.dioxide + density + (pH) + (sulphates) + 
                  (alcohol) + type, data = wine_data)
+
 model_log_int = lm(quality ~ (fixed.acidity + log(volatile.acidity) + 
                                 citric.acid + residual.sugar + chlorides + 
                                 log(free.sulfur.dioxide) + 
@@ -115,6 +117,17 @@ library(car)
 vif_values = vif(full_add_model)
 vif_values
 ```
+
+```{r}
+mod_log_int_cd = cooks.distance(model_log_int)
+
+mod_log_int_fixed = lm(quality ~ (fixed.acidity + log(volatile.acidity) + citric.acid + residual.sugar + chlorides + log(free.sulfur.dioxide) + total.sulfur.dioxide + density + (pH) + (sulphates) + (alcohol) + type)^2, 
+                       data = wine_data, 
+                       subset = mod_log_int_cd < 4 / length(mod_log_int_cd))
+
+summary(mod_log_int_fixed)$adj.r.squared
+```
+
 
 ## Akaike Information Criterion (AIC) and Bayesian Information Criteria (BIC) Modelling
 
