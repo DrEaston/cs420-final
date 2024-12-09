@@ -56,14 +56,14 @@ str(wine_data)
 
 A few data points departed noticeably from the vast majority of the rest of the data.  We removed some obvious outliers to allow us to pursue a model that handles the remainder of the data.
 
-We simply view the data in a table. Then, we simply view columns from biggest to smallest values, and notice that there is a wine observation with a residual sugar value of 65.80, more than double that of the next wine observation.
+We simply view the data in a table, and view the largest values for each column. We first notice that there is a wine observation with a residual sugar value of 65.80, more than double that of the next wine observation.
 
 ```{r}
 desc_res_sugar = wine_data[order(wine_data$residual.sugar, decreasing = TRUE), ]
 head(desc_res_sugar, n = 3)
 ```
 
-We repeat this again for the free sulfur dioxide column, and notice that the wine observation has almost double the value as the next observation.
+We also notice that there is an unusual observation in the free sulfur dioxide column with a value of 289.0, almost double that of the next observation.
 
 ```{r}
 desc_free_sulf_dio = wine_data[order(wine_data$free.sulfur.dioxide, decreasing = TRUE), ]
@@ -83,7 +83,7 @@ wine_data = wine_data[-remove_idx, ]
 
 #### Split Data Into Train and Test
 
-We performed an 80/20 test/train split on the data so that we can later check for over-fitting by training to unseen data. 
+We performed an 80/20 test/train split on the data so that we can later check how our model would perform on unseen data, and to ensure that our model doesn't overfit to our data.
 
 ```{r}
 set.seed(123)
@@ -246,9 +246,6 @@ anova(model_log,model_log_quad)
 ## Multicollinearity 
 
 #### Variance Inflation Factors (VIF) 
-```{r}
-
-
 ```{r message=FALSE, warning=FALSE}
 
 if (!require(car)) install.packages("car")
@@ -383,9 +380,9 @@ All three of our interactive models were shown to be better than our non-additiv
 
 ```{r message=FALSE, warning=FALSE}
 
-anova(model_bac_bic, model_bac_aic)[["Pr(>F)"]]
-anova(model_bac_aic, model_log_int)[["Pr(>F)"]]
-anova(model_bac_bic, model_log_int)[["Pr(>F)"]]
+(anova_aic_bic = anova(model_bac_bic, model_bac_aic)[["Pr(>F)"]])
+(anova_aic_int = anova(model_bac_aic, model_log_int)[["Pr(>F)"]])
+(anova_bic_int = anova(model_bac_bic, model_log_int)[["Pr(>F)"]])
 
 ```
 
@@ -424,8 +421,6 @@ model_bac_aic_cd = lm(formula(model_bac_aic), data = wine_data_trn,
 
 summary(model_bac_aic_cd)$adj.r.squared
 
-model_bac_aic = model_bac_aic_cd
-
 ```
 
 
@@ -439,22 +434,21 @@ model_bac_aic = model_bac_aic_cd
 A Residuals versus fitted plot showed that the data was pretty well evenly distributed, perhaps with some clustering in the middle of the graph that could have to do with the subjective grading scale of the response. 
 
 ```{r message=FALSE, warning=FALSE}
-plot(model_bac_aic, which = 1, main = "Residuals vs Fitted")
+plot(fitted(model_bac_aic_cd), resid(model_bac_aic_cd),
+     xlab = "Fitted", ylab = "Residuals",
+     main = "Data from AIC Model")
+abline(h = 0, col = "orange", lwd = 2, lty = 2)
 ```
 
 Our Normal Q-Q plot indicated that the residuals were normally distributed as most points fell along the center line. 
 
 ```{r message=FALSE, warning=FALSE}
-plot(model_bac_aic, which = 2, main = "Normal Q-Q Plot")
+qqnorm(resid(model_bac_aic_cd), main = "Normal Q-Q Plot")
+qqline(resid(model_bac_aic_cd),
+       col = "orange", lty = 2, lwd = 2)
 ```
 
 ## Evaluating our Model
-
-```{r}
-get_loocv_rmse = function(model) {
-  sqrt(mean((resid(model) / (1 - hatvalues(model))) ^ 2))
-}
-```
 
 ```{r}
 rmse = function(actual, predicted) {
@@ -463,8 +457,8 @@ rmse = function(actual, predicted) {
 ```
 
 ```{r}
-rmse(wine_data_trn$quality, predict(model_bac_aic, wine_data_trn))
-rmse(wine_data_tst$quality, predict(model_bac_aic, wine_data_tst))
+rmse(wine_data_trn$quality, predict(model_bac_aic_cd, wine_data_trn))
+rmse(wine_data_tst$quality, predict(model_bac_aic_cd, wine_data_tst))
 ```
 
 
@@ -472,15 +466,16 @@ rmse(wine_data_tst$quality, predict(model_bac_aic, wine_data_tst))
 
 We arrived at our best model through a backward step AIC upon an interaction model, containing transformations on selected predictors.
 
-To arrive at this model, we took the steps of examining a full additive model, log transforming the variables with skewed distributions, addressing multicollinearity between predictors, experimenting with polynomial terms and interactions, exploring improvements through AIC and BIC modeling, and verifying our progress through ANOVA comparison.
+To arrive at this model, we took the steps of examining a full additive model, log transforming the variables with skewed distributions, addressing multicollinearity between predictors, and experimenting with polynomial terms and interactions.
 
-With each new candidate model, we analyzed how it compared to its predecessor models to assess whether we were headed in a productive direction. We reviewed the summaries of the candidate models, carefully considering outputs such as p-values and adjusted R-squared, to guide our next steps for how to adjust to a better model.
+Once we reached a model we were satisfied with, we looked to make improvements via an interactive model along with AIC and BIC modeling. We reached two models: `model_bac_aic` with `r length(model_bac_aic$coefficients) - 1` coefficients, and `model_bac_bic` with `r length(model_bac_bic$coefficients) - 1` coefficients.
 
-(TODO: Insert relevant measurements for the performance of the model.)
+Both of these models gave very similar adjusted R squared values (`r summary(model_bac_aic)$adj.r.squared` for AIC and `r summary(model_bac_bic)$adj.r.squared` for BIC). Given these two values were very similar, we decided the BIC model would be better, since it had far fewer predictors, making it much easier to interpret the model. However, we check if the extra predictors (from the AIC model) are needed with an analysis of variance (ANOVA).
 
-This model achieved an Adjusted R-squared of `r summary(model_bac_aic)$adj.r.squared`.
+Running an analysis of variance between the AIC and BIC model gave a p-value of `r anova_aic_bic[2]`, suggesting that the smaller model should be rejected in favor of the larger model. As a sanity check, we also run an anova of our larger AIC model against the full-interactive model and get a p-value of `r anova_aic_int[2]`. Since this is larger than 0.05, we favor the smaller model (AIC) over the larger model (full-interactive).
 
-Performing backward BIC delivered a result of `r length(model_bac_aic$coefficients)` coefficients, but...
-(TODO: )
+We choose our AIC model to be our favorite model. To clean up the data for our model, we use Cook's distance to exclude outliers from the model. With our final model, `model_bac_aic_cd`, we achieve an adjusted R squared value of `r summary(model_bac_aic_cd)$adj.r.squared`.
 
-Importantly, we did a final check on our final model to ensure that it obeyed the linear model assumptions.
+We perform final checks on our final model to ensure that it obeyed the linear model assumptions.
+
+Finally, we evaluate how our model performs by getting the RMSE on our test data. We see that on average, our model is off by `rmse(wine_data_tst$quality, predict(model_bac_aic_cd, wine_data_tst))` on a 1 to 10 scale.
