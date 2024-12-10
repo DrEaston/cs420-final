@@ -25,12 +25,8 @@ Each row in the dataset of wine samples contains a record of 11 numerically meas
 
 The 12 attributes listed above served as our source predictor variables. A final attribute from the dataset measures quality, and serves as our response variable. Each quality measurement is a subjectively-assigned integer, ranging from 1 to 10. Our goal was to build a model that could use the objectively measured predictors as inputs to estimate how a human would rate each wine.
 
-
-
-
 ```{r setup}
 options(repos = c(CRAN = "https://cloud.r-project.org"))
-
 ```
 
 # Methods
@@ -56,21 +52,21 @@ str(wine_data)
 
 A few data points departed noticeably from the vast majority of the rest of the data.  We removed some obvious outliers to allow us to pursue a model that handles the remainder of the data.
 
-We simply view the data in a table, and view the largest values for each column. We first notice that there is a wine observation with a residual sugar value of 65.80, more than double that of the next wine observation.
+We viewed the data in a table, and identified the largest values for each column. We first noticed that there is a wine observation with a residual sugar value of 65.80, more than double that of the next wine observation.
 
 ```{r}
 desc_res_sugar = wine_data[order(wine_data$residual.sugar, decreasing = TRUE), ]
 head(desc_res_sugar, n = 3)
 ```
 
-We also notice that there is an unusual observation in the free sulfur dioxide column with a value of 289.0, almost double that of the next observation.
+We also noticed that there is an unusual observation in the free sulfur dioxide column with a value of 289.0, almost double that of the next observation.
 
 ```{r}
 desc_free_sulf_dio = wine_data[order(wine_data$free.sulfur.dioxide, decreasing = TRUE), ]
 head(desc_free_sulf_dio, n = 3)
 ```
 
-Keeping these data will hinder our ability to read and interpret the pairs plots, so we remove them.
+Keeping these data would hinder our ability to read and interpret the pairs plots, so we removed them.
 
 ```{r message=FALSE, warning=FALSE}
 res_sugar_6580 = which(wine_data$residual.sugar == 65.80)
@@ -83,7 +79,7 @@ wine_data = wine_data[-remove_idx, ]
 
 #### Split Data Into Train and Test
 
-We performed an 80/20 test/train split on the data so that we can later check how our model would perform on unseen data, and to ensure that our model doesn't overfit to our data.
+We performed an 80/20 test/train split on the data so that we can later check how our model would perform on unseen data, and to ensure that our model didn't overfit to our data.
 
 ```{r}
 set.seed(123)
@@ -101,7 +97,6 @@ We began by creating an additive model using all predictors without transformati
 full_add_model = lm(quality ~ ., data = wine_data_trn)
 summary(full_add_model)
 ```
-
 
 This initial model had an Adjusted R-squared value of 0.2931, and we sought to improve on that. 
 
@@ -135,8 +130,7 @@ coefficients(model_add_log)
 
 In the summary of the model, we identified volatile.acidity, residual.sugar, free.sulfur.dioxide and total.sulfur.dioxide as predictors that had smaller p values when log transformed. 
 
-We then created 4 separate models, each with a single, different of these variable logged. This will allow us to compare against the additive model. 
-
+We then created four separate models, each with a single, different of these variable logged. This will allow us to compare against the additive model. 
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -166,12 +160,9 @@ summary(model_log1)$adj.r.squared
 summary(model_log2)$adj.r.squared
 summary(model_log3)$adj.r.squared
 summary(model_log4)$adj.r.squared
-
-
 ```
 
-We noted improvement in adjusted r squared when free.sulfur.dioxide and volatile.acidity were logged. These two were then log transformed in further models.
-
+We noted improvement in Adjusted R-squared when free.sulfur.dioxide and volatile.acidity were logged. These two were then log transformed in further models.
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -185,8 +176,7 @@ summary(model_log)$adj.r.squared
 
 ```
 
-The adjusted r squared of this model was higher than any of the 4 previous models compared. 
-
+The Adjusted R-squared of this model was higher than any of the four previous models compared. 
 
 ## Examine quadratic transformation of non-logged variables.
 
@@ -206,9 +196,6 @@ model_squared = lm(
     alcohol + I(alcohol^2) +
     type,
   data = wine_data)
-  
-# summary(model_squared)
-
 
 n = nrow(wine_data)
 model_squared_bic = step(
@@ -220,10 +207,9 @@ model_squared_bic = step(
 summary(model_squared_bic)
 ```
 
-Alcohol looked like it could benefit from being squared as the p value for I(alcohol^2) much smaller than alchohol and coefficient larger as well. So we updated our best model to have alchohol squared, but there was no improvement in model performance. We didnt find any other variables that improved performance when squared, though we tested a few. 
+Alcohol looked like it could benefit from being squared as the p value for I(alcohol^2) much smaller than alcohol and coefficient larger as well. So we updated our best model to have alcohol squared, but there was no improvement in model performance. We didn't find any other variables that improved performance when squared, though we tested a few. 
 
 ```{r}
-
 
 model_log_quad = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid + 
                  residual.sugar + chlorides + log(free.sulfur.dioxide) + 
@@ -231,15 +217,12 @@ model_log_quad = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.aci
                  I(alcohol^2) + type, data = wine_data_trn)
 
 summary(model_log_quad)$adj.r.squared
-
 ```
 
-There was some improvement in adjusted r squared when alchohol was squared. However an anova test failed to reject the null hypothesis that the simpler model explains the data, so we chose not to include this squared term in our model. 
+There was some improvement in Adjusted R-squared when alcohol was squared. However an ANOVA test failed to reject the null hypothesis that the simpler model explains the data, so we chose not to include this squared term in our model. 
 
 ```{r}
-
 anova(model_log,model_log_quad)
-
 ```
 
 
@@ -252,14 +235,11 @@ if (!require(car)) install.packages("car")
 library(car)
 vif_values = vif(model_log)
 vif_values
-
-
 ```
 
 We saw a lot of multicollinearity in our data with density, residual.sugar, and type all over a VIF of 5. We looked to a heatmap to understand how variables might be connected. 
 
 #### Predictor Correlation Heatmap
-
 
 ```{r message=FALSE, warning=FALSE}
 if (!require(corrplot)) install.packages("corrplot")
@@ -296,10 +276,7 @@ model_log_noD = lm(quality ~ fixed.acidity + log(volatile.acidity) + citric.acid
 
 vif_values = vif(model_log_noD)
 vif_values
-
-
 ```
-
 
 ## Summary of performance for various tested models
 
@@ -309,27 +286,20 @@ summary(model_log)$adj.r.squared
 summary(model_log_noD)$adj.r.squared
 ```
 
-
-We choose our no-density model as our best model so far, as it significantly improved our VIF values while maintaining a high adjusted r squared value relative to our other models.
-
-
+We choose our no-density model as our best model so far, as it significantly improved our VIF values while maintaining a high Adjusted R-squared value relative to our other models.
 
 ## Interaction terms
 
-Although we had already lowered our VIF values to a reasonable range, we thought that there might be some remiaining interconnectedness between varibales that, if accounted for with interaction terms, might improve the predictive power of our model. So we applied interaction terms between all our variables and used various strategies to select those which improved our model. 
-
+Although we had already lowered our VIF values to a reasonable range, we thought that there might be some remaining interconnectedness between varibles that, if accounted for with interaction terms, might improve the predictive power of our model. So we applied interaction terms between all our variables and used various strategies to select those which improved our model. 
 
 ``` {r}
-
 model_log_int = lm(quality ~ (fixed.acidity + log(volatile.acidity) + 
                                 citric.acid + residual.sugar + chlorides + 
                                 log(free.sulfur.dioxide) + 
                                 total.sulfur.dioxide + pH + 
                                 sulphates + alcohol + type)^2, 
                    data = wine_data_trn)
-
 ```
-
 
 #### Akaike Information Criterion (AIC) and Bayesian Information Criteria (BIC) Modelling
 
@@ -338,16 +308,11 @@ We used back AIC and BIC to select predictors.
 ```{r message=FALSE, warning=FALSE}
 model_bac_aic = step(model_log_int, trace = 0)
 model_bac_bic = step(model_log_int, k = log(nrow(wine_data_trn)), trace = 0)
-
-
 ```
-
-
 
 ## Analysis of Variance (ANOVA)
 
 We now have 3 potential interaction models. The full interactive model has 66 predictors, and our backwards AIC and BIC models have 44 and 27, respectively. 
-
 
 ```{r}
 
@@ -363,34 +328,28 @@ num_predictors = data.frame(
 
 # Print the table
 print(num_predictors)
-
 ```
 
 We ran anovas between the models to determine which was best. 
 
 ```{r message=FALSE, warning=FALSE}
-
 anova(model_bac_aic, model_log_noD)[["Pr(>F)"]]
 anova(model_bac_bic, model_log_noD)[["Pr(>F)"]]
 anova(model_log_int, model_log_noD)[["Pr(>F)"]]
-
 ```
 
 All three of our interactive models were shown to be better than our non-additive model as anova tests between all three and the additive model yielded small p values (<0.05) such that the null hypothesis was rejected. 
 
 ```{r message=FALSE, warning=FALSE}
-
 (anova_aic_bic = anova(model_bac_bic, model_bac_aic)[["Pr(>F)"]])
 (anova_aic_int = anova(model_bac_aic, model_log_int)[["Pr(>F)"]])
 (anova_bic_int = anova(model_bac_bic, model_log_int)[["Pr(>F)"]])
-
 ```
 
-Anovas between the interactive models provided additional information. Anova between the aic and bic models had a very small p value indicating the more complex model (aic) was better. Aic versus model_log_int had a large p value indicating that the smaller aic model was better. Bac_bic was not significantly better than model_log_int. As a result we took the model_bac_aic which also had the highest adjusted r squared at 0.358. 
+ANOVA tests between the interactive models provided additional information. ANOVA between the AIC and BIC models had a very small p value indicating the more complex model (AIC) was better. AIC versus model_log_int had a large p value indicating that the smaller AIC model was better. Backwards BIC was not significantly better than model_log_int. As a result we took the model_bac_aic which also had the highest Adjusted R-squared at 0.358. 
 
 ```{r message=FALSE, warning=FALSE}
-
-# Create a table with adjusted R-squared values
+# Create a table with Adjusted R-squared values
 adj_r_squared_table = data.frame(
   Model = c("model_bac_aic", "model_bac_bic", "model_log_int"),
   `Adjusted R-squared` = c(
@@ -401,37 +360,26 @@ adj_r_squared_table = data.frame(
 )
 
 print(adj_r_squared_table)
-
-
 ```
-
 
 ## Remove more outliers
 
-With a solid model to build upon, we used cook's distance to remove more outliers in the model. 
-
+With a solid model to build upon, we used Cook's distance to remove more outliers in the model. 
 
 ```{r}
-
-
 mod_cd = cooks.distance(model_bac_aic)
 
 model_bac_aic_cd = lm(formula(model_bac_aic), data = wine_data_trn,
                  subset = mod_cd < 4 / length(mod_cd))
 
 summary(model_bac_aic_cd)$adj.r.squared
-
 ```
-
 
 # Results
 
-
-
-
 ## Linear Model Assumption Diagnostic Plots
 
-A Residuals versus fitted plot showed that the data was pretty well evenly distributed, perhaps with some clustering in the middle of the graph that could have to do with the subjective grading scale of the response. 
+A Residuals versus Fitted plot showed that the data was pretty well evenly distributed, perhaps with some clustering in the middle of the graph that could have to do with the subjective grading scale of the response. 
 
 ```{r message=FALSE, warning=FALSE}
 plot(fitted(model_bac_aic_cd), resid(model_bac_aic_cd),
@@ -461,7 +409,6 @@ rmse(wine_data_trn$quality, predict(model_bac_aic_cd, wine_data_trn))
 rmse(wine_data_tst$quality, predict(model_bac_aic_cd, wine_data_tst))
 ```
 
-
 # Discussion
 
 We arrived at our best model through a backward step AIC upon an interaction model, containing transformations on selected predictors.
@@ -470,12 +417,12 @@ To arrive at this model, we took the steps of examining a full additive model, l
 
 Once we reached a model we were satisfied with, we looked to make improvements via an interactive model along with AIC and BIC modeling. We reached two models: `model_bac_aic` with `r length(model_bac_aic$coefficients) - 1` coefficients, and `model_bac_bic` with `r length(model_bac_bic$coefficients) - 1` coefficients.
 
-Both of these models gave very similar adjusted R squared values (`r summary(model_bac_aic)$adj.r.squared` for AIC and `r summary(model_bac_bic)$adj.r.squared` for BIC). Given these two values were very similar, we decided the BIC model would be better, since it had far fewer predictors, making it much easier to interpret the model. However, we check if the extra predictors (from the AIC model) are needed with an analysis of variance (ANOVA).
+Both of these models gave very similar Adjusted R-squared values (`r summary(model_bac_aic)$adj.r.squared` for AIC and `r summary(model_bac_bic)$adj.r.squared` for BIC). Given these two values were very similar, we decided the BIC model would be better, since it had far fewer predictors, making it much easier to interpret the model. However, we check if the extra predictors (from the AIC model) are needed with an analysis of variance (ANOVA).
 
 Running an analysis of variance between the AIC and BIC model gave a p-value of `r anova_aic_bic[2]`, suggesting that the smaller model should be rejected in favor of the larger model. As a sanity check, we also run an anova of our larger AIC model against the full-interactive model and get a p-value of `r anova_aic_int[2]`. Since this is larger than 0.05, we favor the smaller model (AIC) over the larger model (full-interactive).
 
-We choose our AIC model to be our favorite model. To clean up the data for our model, we use Cook's distance to exclude outliers from the model. With our final model, `model_bac_aic_cd`, we achieve an adjusted R squared value of `r summary(model_bac_aic_cd)$adj.r.squared`.
+We choose our AIC model to be our favorite model. To clean up the data for our model, we use Cook's distance to exclude outliers from the model. With our final model, `model_bac_aic_cd`, we achieve an Adjusted R-squared value of `r summary(model_bac_aic_cd)$adj.r.squared`.
 
-We perform final checks on our final model to ensure that it obeyed the linear model assumptions.
+We performed final checks on our final model to ensure that it obeyed the linear model assumptions.
 
 Finally, we evaluate how our model performs by getting the RMSE on our test data. We see that on average, our model is off by `rmse(wine_data_tst$quality, predict(model_bac_aic_cd, wine_data_tst))` on a 1 to 10 scale.
