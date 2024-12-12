@@ -95,10 +95,10 @@ We began by creating an additive model using all predictors without transformati
 
 ```{r message=FALSE, warning=FALSE}
 full_add_model = lm(quality ~ ., data = wine_data_trn)
-summary(full_add_model)
+(summary_full_model = summary(full_add_model))
 ```
 
-This initial model had an Adjusted R-squared value of 0.3031, and we sought to improve on that. 
+This initial model had an Adjusted R-squared value of `r summary_full_model$adj.r.squared`, and we sought to improve on that. 
 
 ## Log Transform Predictors
 
@@ -340,7 +340,7 @@ model_bac_bic = step(model_log_int, k = log(nrow(wine_data_trn)), trace = 0)
 
 ## Analysis of Variance (ANOVA)
 
-We now have 3 potential interaction models. The full interactive model has 120 predictors, and our backwards AIC and BIC models have 68 and 41, respectively. 
+We now have 3 potential interaction models. The full interactive model has `r length(model_log_int$coefficients) - 1` predictors, and our backwards AIC and BIC models have `r length(model_bac_aic$coefficients) - 1` and `r length(model_bac_bic$coefficients) - 1`, respectively. 
 
 ```{r}
 
@@ -374,7 +374,7 @@ All three of our interactive models were shown to be better than our non-interac
 
 ```
 
-ANOVA tests between the interactive models provided additional information. ANOVA between the AIC and BIC models had a very small p value indicating the more complex model (AIC) was better. AIC versus model_log_int had a large p value indicating that the smaller AIC model was better. As a result we took the model_bac_aic which also had the highest Adjusted R-squared at 0.377. 
+ANOVA tests between the interactive models provided additional information. ANOVA between the AIC and BIC models had a very small p value indicating the more complex model (AIC) was better. AIC versus model_log_int had a large p value indicating that the smaller AIC model was better. As a result we decided to proceed with `model_bac_aic` which also had the highest Adjusted R-squared at `r summary(model_bac_aic)$adj.r.squared`. 
 
 ```{r message=FALSE, warning=FALSE}
 # Create a table with Adjusted R-squared values
@@ -433,11 +433,11 @@ rmse = function(actual, predicted) {
 ```
 
 ```{r}
-rmse(wine_data_trn$quality, predict(model_bac_aic_cd, wine_data_trn))
-rmse(wine_data_tst$quality, predict(model_bac_aic_cd, wine_data_tst))
+(rmse_trn = rmse(wine_data_trn$quality, predict(model_bac_aic_cd, wine_data_trn)))
+(rmse_tst = rmse(wine_data_tst$quality, predict(model_bac_aic_cd, wine_data_tst)))
 ```
 
-We were pleased with the RMSE of our final model. The values were similar for test and train, indicating we were not overfitting. Overall our RMSE was 0.69 on test data, indicating that on average, our predicted quality score was well within 1 point of the actual score. 
+We were pleased with the RMSE of our final model. The values were similar for test and train, indicating we were not overfitting. Overall our RMSE was `r rmse_tst` on test data, indicating that on average, our predicted quality score was well within 1 point of the actual score. 
 
 # Discussion
 
@@ -455,4 +455,4 @@ We choose our AIC model to be our favorite model. To clean up the data for our m
 
 We performed final checks on our final model to ensure that it obeyed the linear model assumptions.
 
-Finally, we evaluate how our model performs by getting the RMSE on our test data. We see that on average, our model is off by `rmse(wine_data_tst$quality, predict(model_bac_aic_cd, wine_data_tst))` on a 1 to 10 scale.
+Finally, we evaluate how our model performs by getting the RMSE on our test data. We see that on average, our model is off by `r rmse_tst` on a 1 to 10 scale.
